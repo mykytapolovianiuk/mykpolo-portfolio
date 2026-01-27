@@ -3,6 +3,8 @@
 @theme inline {
   --color-brand-black: #000000;
   --color-brand-white: #FFFFFF;
+  --animate-scroll-up: scroll-up 2s linear infinite;
+  --animate-scroll-down: scroll-down 2s linear infinite
 }
 
 body, a { 
@@ -26,4 +28,23 @@ h1, h2, h3, .font-display {
 
 .side-panel {
   z-index: 40;
+}
+
+
+@keyframes scroll-down {
+  0% { transform: translateY(-50%); }
+  100% { transform: translateY(0%); }
+}
+
+@keyframes scroll-up {
+  0% { transform: translateY(0%); }
+  100% { transform: translateY(-50%); }
+}
+
+.animate-infinite-scroll-down {
+  animation: scroll-down 0.6s linear infinite; /* Ultra-fast speed */
+}
+
+.animate-infinite-scroll-up {
+  animation: scroll-up 0.6s linear infinite; /* Ultra-fast speed */
 }

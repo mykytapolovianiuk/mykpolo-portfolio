@@ -2,106 +2,71 @@
 
 import { useGSAP } from '@gsap/react';
 import gsap from 'gsap';
-import { useEffect, useState } from 'react';
+import { useRef } from 'react';
 
 interface LoadingScreenProps {
   onComplete: () => void;
 }
 
 export function LoadingScreen({ onComplete }: LoadingScreenProps) {
-  const [isReady, setIsReady] = useState(false);
-
-  // Real loading check with mandatory 2-second delay
-  useEffect(() => {
-    const handleLoad = () => {
-      setTimeout(() => {
-        setIsReady(true);
-      }, 2000); // Mandatory 2-second delay
-    };
-
-    if (document.readyState === 'complete') {
-      handleLoad();
-    } else {
-      window.addEventListener('load', handleLoad);
-    }
-
-    return () => {
-      window.removeEventListener('load', handleLoad);
-    };
-  }, []);
+  const containerRef = useRef<HTMLDivElement>(null);
+  const leftPanelRef = useRef<HTMLDivElement>(null);
+  const rightPanelRef = useRef<HTMLDivElement>(null);
 
   useGSAP(() => {
-    if (!isReady) return;
-
-    // Create vertical column animations
-    const leftColumns = gsap.utils.toArray('.left-panel .scroll-column') as HTMLElement[];
-    const rightColumns = gsap.utils.toArray('.right-panel .scroll-column') as HTMLElement[];
-    
-    // Left panel columns scroll UP (chaotic speed)
-    leftColumns.forEach((column, index) => {
-      gsap.to(column, {
-        yPercent: -100,
-        duration: 6 + Math.random() * 4, // Random speed between 6-10 seconds
-        repeat: -1,
-        ease: 'none'
-      });
-    });
-
-    // Right panel columns scroll DOWN (chaotic speed)
-    rightColumns.forEach((column, index) => {
-      gsap.to(column, {
-        yPercent: 100,
-        duration: 6 + Math.random() * 4, // Random speed between 6-10 seconds
-        repeat: -1,
-        ease: 'none'
-      });
-    });
-
-    // Curtain exit animation - Left slides left, Right slides right
     const tl = gsap.timeline({
-      delay: 0.5,
-      onComplete: () => {
-        setTimeout(onComplete, 300);
-      }
+      onComplete: onComplete
     });
 
-    tl.to('.left-panel', {
-      xPercent: -100,
-      duration: 1.2,
-      ease: 'power3.inOut'
-    }, 0);
+    // 1. Run infinite scroll for 2.5 seconds
+    tl.to({}, { duration: 2.5 });
 
-    tl.to('.right-panel', {
-      xPercent: 100,
+    // 2. Animate curtain open (Left -> -100%, Right -> +100%)
+    tl.to([leftPanelRef.current, rightPanelRef.current], {
+      xPercent: (i) => i === 0 ? -100 : 100,
       duration: 1.2,
-      ease: 'power3.inOut'
-    }, 0);
-  }, [isReady]);
+      ease: 'power4.inOut',
+    });
 
-  // Generate columns of text with proper spacing
-  const generateColumns = (count: number) => {
-    return Array(count).fill(null).map((_, index) => (
-      <div key={index} className="scroll-column whitespace-nowrap font-display text-brand-black text-[32px] font-bold uppercase tracking-wider">
-        {Array(12).fill("POLO MYKPOLO").join(" ")}
+    // 3. Remove container
+    tl.to(containerRef.current, { display: 'none' });
+  }, { scope: containerRef });
+
+  // Conveyor Belt Generator
+  const ConveyorBelt = ({ direction }: { direction: 'up' | 'down' }) => {
+    // Create tall list of "MYK POLO MYKPOLO" for dense wall effect
+    const content = Array(40).fill("MYK POLO MYKPOLO").map((text, i) => (
+      <div key={i} className="font-display font-bold text-[6vh] leading-[0.85] text-brand-black tracking-tight uppercase">
+        {text}
       </div>
     ));
-  };
 
-  if (!isReady) return null;
-
-  return (
-    <div className="fixed inset-0 z-50 flex">
-      {/* Left Panel - White background, Black text */}
-      <div className="left-panel w-1/2 bg-brand-white flex items-center justify-center overflow-hidden relative">
-        <div className="absolute inset-0 flex flex-col justify-around px-12">
-          {generateColumns(8)}
+    return (
+      <div className="relative h-screen overflow-hidden flex-1 flex justify-center">
+        {/* Animated container with TWO content sets for seamless loop */}
+        <div className={`flex flex-col items-center ${direction === 'down' ? 'animate-infinite-scroll-down' : 'animate-infinite-scroll-up'}`}>
+          {content}
+          {content} {/* Duplicate for looping */}
         </div>
       </div>
-      
-      {/* Right Panel - White background, Black text */}
-      <div className="right-panel w-1/2 bg-brand-white flex items-center justify-center overflow-hidden relative">
-        <div className="absolute inset-0 flex flex-col justify-around px-12">
-          {generateColumns(8)}
+    );
+  };
+
+  return (
+    <div ref={containerRef} className="fixed inset-0 z-50 flex bg-brand-white">
+      {/* Left Panel - Moves DOWN */}
+      <div ref={leftPanelRef} className="w-1/2 h-full bg-brand-white border-r border-brand-black/10 overflow-hidden flex items-center">
+        <div className="w-full flex justify-center gap-4 opacity-80">
+          <ConveyorBelt direction="down" />
+          <ConveyorBelt direction="down" />
+        </div>
+      </div>
+
+      {/* Right Panel - Moves UP */}
+      <div ref={rightPanelRef} className="w-1/2 h-full bg-brand-white overflow-hidden flex items-center">
+        <div className="w-full flex justify-center gap-4 opacity-80">
+          <ConveyorBelt direction="up" />
+          <ConveyorBelt direction="up" />
         </div>
       </div>
     </div>
