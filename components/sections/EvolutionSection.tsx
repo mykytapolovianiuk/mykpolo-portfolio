@@ -4,22 +4,29 @@ import { useGSAP } from '@gsap/react';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { useRef } from 'react';
-import { generateShapes } from '../utils/geometry';
 
 // Register ScrollTrigger plugin
 if (typeof window !== 'undefined') {
   gsap.registerPlugin(ScrollTrigger);
 }
 
+// PRECISE SVG PATHS WITH EXACTLY 12 VERTICES EACH
+// SQUARE (12 points) - Equidistant distribution along perimeter
+const PATH_SQUARE = "M 0 0 L 33.33 0 L 66.66 0 L 100 0 L 100 33.33 L 100 66.66 L 100 100 L 66.66 100 L 33.33 100 L 0 100 L 0 66.66 L 0 33.33 Z";
+
+// TRIANGLE (12 points) - Even distribution across 3 sides
+const PATH_TRIANGLE = "M 50 0 L 66.66 33.33 L 83.33 66.66 L 100 100 L 66.66 100 L 33.33 100 L 0 100 L 16.66 66.66 L 33.33 33.33 L 50 0 L 50 0 L 50 0 Z";
+
+// CIRCLE (12-point polygon approximation) - Guaranteed stability
+const PATH_CIRCLE_POLY = "M 50 0 L 75 6.7 L 93.3 25 L 100 50 L 93.3 75 L 75 93.3 L 50 100 L 25 93.3 L 6.7 75 L 0 50 L 6.7 25 L 25 6.7 Z";
+
 export function EvolutionSection() {
   const sectionRef = useRef<HTMLDivElement>(null);
   const nameRef = useRef<HTMLDivElement>(null);
   const wordsRef = useRef<(HTMLDivElement | null)[]>([]);
-  const shapeRef = useRef<HTMLDivElement>(null);
+  const svgRef = useRef<SVGSVGElement>(null);
+  const pathRef = useRef<SVGPathElement>(null);
   const finalTextRef = useRef<HTMLDivElement>(null);
-
-  // Generate mathematical shapes with 120 vertices each
-  const shapes = generateShapes();
 
   // Word data with their final positions forming a rectangle around center
   const wordsData = [
@@ -34,7 +41,7 @@ export function EvolutionSection() {
   ];
 
   useGSAP(() => {
-    if (!sectionRef.current) return;
+    if (!sectionRef.current || !pathRef.current) return;
 
     // Set initial random positions for words (chaos state)
     wordsRef.current.forEach((wordEl, i) => {
@@ -48,8 +55,8 @@ export function EvolutionSection() {
       }
     });
 
-    // Hide shape and final text initially
-    gsap.set([shapeRef.current, finalTextRef.current], {
+    // Hide SVG and final text initially
+    gsap.set([svgRef.current, finalTextRef.current], {
       autoAlpha: 0
     });
 
@@ -58,9 +65,9 @@ export function EvolutionSection() {
       scrollTrigger: {
         trigger: sectionRef.current,
         start: "top top",
-        end: "+=500%",
+        end: "+=600%",
         pin: true,
-        scrub: 0.5, // Add slight smoothing
+        scrub: 0.5, // Smooth scrubbing for premium feel
         anticipatePin: 1
       }
     });
@@ -79,32 +86,32 @@ export function EvolutionSection() {
       }
     });
 
-    // STEP 2: The Singularity - Words vanish, Shape appears with Square state
+    // STEP 2: The Switch - Hide words/text, show SVG with Square path
     tl.to([nameRef.current, ...wordsRef.current.filter(Boolean)], {
       autoAlpha: 0,
       duration: 0.3
     }, 1.2);
 
-    tl.to(shapeRef.current, {
+    tl.to(svgRef.current, {
       autoAlpha: 1,
       duration: 0.3
     }, 1.3);
 
-    // Set initial square state using mathematical 120-vertex polygon
-    gsap.set(shapeRef.current, {
-      clipPath: shapes.square
+    // Set initial square path
+    gsap.set(pathRef.current, {
+      attr: { d: PATH_SQUARE }
     });
 
-    // STEP 3: Morph 1 (Square -> Triangle) - Liquid transition due to identical vertex count
-    tl.to(shapeRef.current, {
-      clipPath: shapes.triangle,
+    // STEP 3: Morph 1 (Square -> Triangle) - SVG path interpolation
+    tl.to(pathRef.current, {
+      attr: { d: PATH_TRIANGLE },
       duration: 1.5,
       ease: "power2.inOut"
     }, 1.8);
 
-    // STEP 4: Morph 2 (Triangle -> Circle) - Perfect liquid morph
-    tl.to(shapeRef.current, {
-      clipPath: shapes.circle,
+    // STEP 4: Morph 2 (Triangle -> Circle) - Smooth path transition
+    tl.to(pathRef.current, {
+      attr: { d: PATH_CIRCLE_POLY },
       duration: 1.5,
       ease: "power2.inOut"
     }, 3.5);
@@ -118,7 +125,7 @@ export function EvolutionSection() {
     }, 4.2);
 
     // Heartbeat animation (independent, starts after circle formation)
-    tl.to(shapeRef.current, {
+    tl.to(svgRef.current, {
       scale: 1.05,
       repeat: -1,
       yoyo: true,
@@ -153,11 +160,17 @@ export function EvolutionSection() {
         </div>
       ))}
 
-      {/* The Shape - Mathematical 120-vertex morphing element */}
-      <div
-        ref={shapeRef}
-        className="w-[300px] h-[300px] bg-brand-black absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-20"
-      />
+      {/* The Shape - SVG with precise path morphing */}
+      <svg 
+        ref={svgRef}
+        className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[300px] h-[300px] z-20"
+        viewBox="0 0 100 100"
+      >
+        <path 
+          ref={pathRef}
+          fill="black"
+        />
+      </svg>
 
       {/* Final Text */}
       <div
