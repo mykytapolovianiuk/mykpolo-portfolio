@@ -3,6 +3,7 @@
 import { useGSAP } from '@gsap/react';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
+import { interpolate } from 'flubber';
 import { useRef } from 'react';
 
 // Register ScrollTrigger plugin
@@ -10,15 +11,10 @@ if (typeof window !== 'undefined') {
   gsap.registerPlugin(ScrollTrigger);
 }
 
-// PRECISE SVG PATHS WITH EXACTLY 12 VERTICES EACH
-// SQUARE (12 points) - Equidistant distribution along perimeter
-const PATH_SQUARE = "M 0 0 L 33.33 0 L 66.66 0 L 100 0 L 100 33.33 L 100 66.66 L 100 100 L 66.66 100 L 33.33 100 L 0 100 L 0 66.66 L 0 33.33 Z";
-
-// TRIANGLE (12 points) - Even distribution across 3 sides
-const PATH_TRIANGLE = "M 50 0 L 66.66 33.33 L 83.33 66.66 L 100 100 L 66.66 100 L 33.33 100 L 0 100 L 16.66 66.66 L 33.33 33.33 L 50 0 L 50 0 L 50 0 Z";
-
-// CIRCLE (12-point polygon approximation) - Guaranteed stability
-const PATH_CIRCLE_POLY = "M 50 0 L 75 6.7 L 93.3 25 L 100 50 L 93.3 75 L 75 93.3 L 50 100 L 25 93.3 L 6.7 75 L 0 50 L 6.7 25 L 25 6.7 Z";
+// STANDARD SIMPLE SVG PATHS - Flubber handles the complexity
+const SHAPE_SQUARE = "M 10 10 L 90 10 L 90 90 L 10 90 Z"; // Simple Square
+const SHAPE_TRIANGLE = "M 50 10 L 90 90 L 10 90 Z"; // Simple Triangle
+const SHAPE_CIRCLE = "M 50 10 C 72 10 90 28 90 50 C 90 72 72 90 50 90 C 28 90 10 72 10 50 C 10 28 28 10 50 10 Z"; // Perfect Bezier Circle
 
 export function EvolutionSection() {
   const sectionRef = useRef<HTMLDivElement>(null);
@@ -60,22 +56,22 @@ export function EvolutionSection() {
       autoAlpha: 0
     });
 
-    // Create timeline with ScrollTrigger
-    const tl = gsap.timeline({
+    // Create master timeline with ScrollTrigger
+    const masterTimeline = gsap.timeline({
       scrollTrigger: {
         trigger: sectionRef.current,
         start: "top top",
-        end: "+=600%",
+        end: "+=500%",
         pin: true,
-        scrub: 0.5, // Smooth scrubbing for premium feel
+        scrub: 1,
         anticipatePin: 1
       }
     });
 
-    // STEP 1: Chaos -> Order (Words assemble into rectangle)
+    // PHASE 1: ASSEMBLE - Words animate to rectangle formation
     wordsRef.current.forEach((wordEl, i) => {
       if (wordEl) {
-        tl.to(wordEl, {
+        masterTimeline.to(wordEl, {
           x: wordsData[i].x,
           y: wordsData[i].y,
           opacity: 1,
@@ -86,46 +82,62 @@ export function EvolutionSection() {
       }
     });
 
-    // STEP 2: The Switch - Hide words/text, show SVG with Square path
-    tl.to([nameRef.current, ...wordsRef.current.filter(Boolean)], {
+    // PHASE 2: THE SWAP - Hide words -> Show SVG Path (Square)
+    masterTimeline.to([nameRef.current, ...wordsRef.current.filter(Boolean)], {
       autoAlpha: 0,
       duration: 0.3
     }, 1.2);
 
-    tl.to(svgRef.current, {
+    masterTimeline.to(svgRef.current, {
       autoAlpha: 1,
       duration: 0.3
     }, 1.3);
 
     // Set initial square path
     gsap.set(pathRef.current, {
-      attr: { d: PATH_SQUARE }
+      attr: { d: SHAPE_SQUARE }
     });
 
-    // STEP 3: Morph 1 (Square -> Triangle) - SVG path interpolation
-    tl.to(pathRef.current, {
-      attr: { d: PATH_TRIANGLE },
+    // PHASE 3: LIQUID MORPH (Square -> Triangle)
+    const squareToTriangle = interpolate(SHAPE_SQUARE, SHAPE_TRIANGLE);
+    const proxy1 = { t: 0 };
+
+    masterTimeline.to(proxy1, {
+      t: 1,
       duration: 1.5,
-      ease: "power2.inOut"
+      ease: "power2.inOut",
+      onUpdate: () => {
+        if (pathRef.current) {
+          pathRef.current.setAttribute('d', squareToTriangle(proxy1.t));
+        }
+      }
     }, 1.8);
 
-    // STEP 4: Morph 2 (Triangle -> Circle) - Smooth path transition
-    tl.to(pathRef.current, {
-      attr: { d: PATH_CIRCLE_POLY },
+    // PHASE 4: LIQUID MORPH (Triangle -> Circle)
+    const triangleToCircle = interpolate(SHAPE_TRIANGLE, SHAPE_CIRCLE);
+    const proxy2 = { t: 0 };
+
+    masterTimeline.to(proxy2, {
+      t: 1,
       duration: 1.5,
-      ease: "power2.inOut"
+      ease: "power2.inOut",
+      onUpdate: () => {
+        if (pathRef.current) {
+          pathRef.current.setAttribute('d', triangleToCircle(proxy2.t));
+        }
+      }
     }, 3.5);
 
-    // STEP 5: Reveal final text
-    tl.to(finalTextRef.current, {
+    // PHASE 5: FINAL TEXT REVEAL
+    masterTimeline.to(finalTextRef.current, {
       autoAlpha: 1,
       y: 0,
       duration: 0.8,
       ease: "power2.out"
     }, 4.2);
 
-    // Heartbeat animation (independent, starts after circle formation)
-    tl.to(svgRef.current, {
+    // PULSE ANIMATION (Independent) - Start after circle formation
+    masterTimeline.to(svgRef.current, {
       scale: 1.05,
       repeat: -1,
       yoyo: true,
@@ -160,10 +172,10 @@ export function EvolutionSection() {
         </div>
       ))}
 
-      {/* The Shape - SVG with precise path morphing */}
+      {/* The SVG - Liquid morphing powered by flubber */}
       <svg 
         ref={svgRef}
-        className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[300px] h-[300px] z-20"
+        className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[300px] h-[300px] md:w-[400px] md:h-[400px] z-20"
         viewBox="0 0 100 100"
       >
         <path 
