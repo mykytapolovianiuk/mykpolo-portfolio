@@ -57,7 +57,7 @@ export function LoadingScreen({ onComplete }: LoadingScreenProps) {
       });
     });
 
-    // Curtain exit animation
+    // Curtain exit animation - Left slides left, Right slides right
     const tl = gsap.timeline({
       delay: 0.5,
       onComplete: () => {
@@ -81,8 +81,8 @@ export function LoadingScreen({ onComplete }: LoadingScreenProps) {
   // Generate columns of text
   const generateColumns = (count: number) => {
     return Array(count).fill(null).map((_, index) => (
-      <div key={index} className="scroll-column whitespace-nowrap font-display text-white text-3xl font-bold uppercase tracking-wider">
-        {Array(20).fill("POLO MYKPOLO").join(" ")}
+      <div key={index} className="scroll-column whitespace-nowrap font-display text-white text-[24px] font-bold uppercase tracking-wider">
+        {Array(15).fill("POLO MYKPOLO").join(" ")}
       </div>
     ));
   };
@@ -91,17 +91,17 @@ export function LoadingScreen({ onComplete }: LoadingScreenProps) {
 
   return (
     <div className="fixed inset-0 z-50 flex">
-      {/* Left Panel */}
+      {/* Left Panel - Black background, White text */}
       <div className="left-panel w-1/2 bg-brand-black flex items-center justify-center overflow-hidden relative">
-        <div className="absolute inset-0 flex flex-col justify-around">
-          {generateColumns(8)}
+        <div className="absolute inset-0 flex flex-col justify-around px-8">
+          {generateColumns(10)}
         </div>
       </div>
       
-      {/* Right Panel */}
+      {/* Right Panel - Black background, White text */}
       <div className="right-panel w-1/2 bg-brand-black flex items-center justify-center overflow-hidden relative">
-        <div className="absolute inset-0 flex flex-col justify-around">
-          {generateColumns(8)}
+        <div className="absolute inset-0 flex flex-col justify-around px-8">
+          {generateColumns(10)}
         </div>
       </div>
     </div>

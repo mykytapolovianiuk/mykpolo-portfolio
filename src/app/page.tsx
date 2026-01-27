@@ -16,6 +16,20 @@ export default function Home() {
         delay: 0.3
       });
 
+      // Animate name
+      tl.fromTo('.hero-name',
+        {
+          y: 50,
+          opacity: 0
+        },
+        {
+          y: 0,
+          opacity: 1,
+          duration: 1,
+          ease: 'power2.out'
+        }
+      );
+
       // Animate triangle
       tl.fromTo('.hero-triangle',
         {
@@ -29,34 +43,6 @@ export default function Home() {
           rotation: 0,
           duration: 1.2,
           ease: 'back.out(1.7)'
-        }
-      );
-
-      // Animate name parts
-      tl.fromTo('.hero-name-top',
-        {
-          x: -50,
-          opacity: 0
-        },
-        {
-          x: 0,
-          opacity: 1,
-          duration: 0.8,
-          ease: 'power2.out'
-        },
-        '-=0.6'
-      );
-
-      tl.fromTo('.hero-name-bottom',
-        {
-          x: 50,
-          opacity: 0
-        },
-        {
-          x: 0,
-          opacity: 1,
-          duration: 0.8,
-          ease: 'power2.out'
         },
         '-=0.7'
       );
@@ -72,75 +58,67 @@ export default function Home() {
       <div className={`transition-opacity duration-300 ${isLoading ? 'opacity-0' : 'opacity-100'}`}>
         <Header />
         
-        {/* Hero Section - White Background */}
-        <section className="min-h-screen bg-brand-white flex flex-col items-center justify-center relative px-6 overflow-hidden">
-          <div className="text-center relative">
-            {/* Name Top Left of Triangle */}
-            <div className="hero-name-top font-display text-4xl md:text-6xl font-bold mb-8 text-brand-black absolute -top-16 left-1/2 transform -translate-x-1/2 -translate-y-full">
-              Mykyta
-            </div>
-            
-            {/* Black Triangle */}
-            <div className="hero-triangle my-8">
-              <svg 
-                width="120" 
-                height="104" 
-                viewBox="0 0 120 104" 
-                className="mx-auto"
-              >
-                <polygon 
-                  points="60,0 0,104 120,104" 
-                  fill="currentColor" 
-                  className="text-brand-black"
-                />
-              </svg>
-            </div>
-            
-            {/* Name Bottom Right of Triangle */}
-            <div className="hero-name-bottom font-display text-4xl md:text-6xl font-bold mt-8 text-brand-black absolute -bottom-16 left-1/2 transform -translate-x-1/2 translate-y-full">
-              Polovianiuk
-            </div>
+        {/* Hero Section - White Background with Exact Figma Positioning */}
+        <section className="relative min-h-screen bg-brand-white overflow-hidden">
+          {/* Main Name - Positioned exactly as Figma: top-[436px], left-[52px] */}
+          <div className="hero-name absolute top-[436px] left-[52px]">
+            <h1 className="font-display font-bold text-[128px] leading-[200px] text-brand-black md:text-[128px] text-[64px]">
+              Mykyta Polovianiuk
+            </h1>
           </div>
           
-          {/* Footer with Links */}
-          <div className="absolute bottom-8 left-0 right-0 px-6">
-            <div className="flex justify-between items-center">
-              {/* Email Link */}
-              <a 
-                href="mailto:mykytapolovianiuk.work@gmail.com"
-                className="text-sm font-sans text-brand-black hover:opacity-70 transition-opacity lowercase"
-              >
-                Email
-              </a>
-              
-              {/* Center Arrow and Location */}
-              <div className="flex flex-col items-center">
-                <svg 
-                  width="20" 
-                  height="20" 
-                  viewBox="0 0 24 24" 
-                  className="text-brand-black mb-1"
-                >
-                  <path 
-                    d="M7 10l5 5 5-5z" 
-                    fill="currentColor"
-                  />
-                </svg>
-                <span className="text-xs font-sans text-brand-black lowercase">
-                  based in kyiv
-                </span>
-              </div>
-              
-              {/* Instagram Link */}
-              <a 
-                href="https://instagram.com"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="text-sm font-sans text-brand-black hover:opacity-70 transition-opacity lowercase"
-              >
-                Instagram
-              </a>
-            </div>
+          {/* Center Triangle - Positioned in remaining space */}
+          <div className="hero-triangle absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2">
+            <svg 
+              width="140" 
+              height="121" 
+              viewBox="0 0 140 121" 
+              className="text-brand-black"
+            >
+              <polygon 
+                points="70,0 0,121 140,121" 
+                fill="currentColor"
+              />
+            </svg>
+          </div>
+          
+          {/* Footer Elements - Positioned exactly as Figma */}
+          {/* Email Link - bottom-[35px], left-[52px] */}
+          <a 
+            href="mailto:mykytapolovianiuk.work@gmail.com"
+            className="absolute bottom-[35px] left-[52px] font-sans text-[16px] text-brand-black hover:underline transition-all lowercase"
+          >
+            mykytapolovianiuk.work@gmail.com
+          </a>
+          
+          {/* Instagram Link - bottom-[35px], right-[52px] */}
+          <a 
+            href="https://instagram.com"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="absolute bottom-[35px] right-[52px] font-sans text-[16px] text-brand-black hover:underline transition-all lowercase"
+          >
+            @mykpolo
+          </a>
+          
+          {/* Location Text - bottom-[33px], centered */}
+          <div className="absolute bottom-[33px] left-1/2 transform -translate-x-1/2 font-sans text-[16px] text-brand-black">
+            based in kyiv
+          </div>
+          
+          {/* Arrow Icon - centered, bottom-[120px] (approx top 885px) */}
+          <div className="absolute bottom-[120px] left-1/2 transform -translate-x-1/2">
+            <svg 
+              width="24" 
+              height="24" 
+              viewBox="0 0 24 24" 
+              className="text-brand-black"
+            >
+              <path 
+                d="M7 10l5 5 5-5z" 
+                fill="currentColor"
+              />
+            </svg>
           </div>
         </section>
 

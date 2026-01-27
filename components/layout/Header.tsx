@@ -25,66 +25,93 @@ export function Header() {
 
   return (
     <>
-      {/* Header */}
-      <header className="fixed top-0 left-0 right-0 z-40 mix-blend-difference p-6 text-white">
-        <div className="container mx-auto flex justify-between items-center">
-          <div className="font-display font-bold text-xl uppercase">
+      {/* Fixed Logo and Menu Trigger - Absolute positioning to match Figma */}
+      <div className="fixed top-0 left-0 w-full h-0 z-50 pointer-events-none">
+        {/* Logo - Positioned exactly as Figma: top-[30px], left-[52px] */}
+        <div className="absolute top-[30px] left-[52px] pointer-events-auto">
+          <div className="font-display font-bold text-[24px] text-brand-black">
             MYKPOLO
           </div>
-          <button 
-            onClick={() => setIsPanelOpen(true)}
-            className="font-display text-sm uppercase tracking-wider"
-          >
-            #about
-          </button>
         </div>
-      </header>
+        
+        {/* About Trigger - Positioned exactly as Figma: top-[35px], right-[52px] */}
+        <button 
+          onClick={() => setIsPanelOpen(true)}
+          className="absolute top-[35px] right-[52px] font-display font-bold text-[16px] text-brand-black hover:opacity-70 transition-opacity pointer-events-auto uppercase"
+        >
+          #about
+        </button>
+      </div>
 
-      {/* Side Panel Overlay */}
-      <div className={`side-panel fixed top-0 right-0 h-full bg-brand-black z-30 w-full md:w-3/4 lg:w-1/2 ${isPanelOpen ? '' : 'translate-x-full'}`}>
-        <div className="h-full flex flex-col p-8 md:p-12">
-          {/* Close Button */}
-          <div className="flex justify-end mb-8">
+      {/* Side Panel Overlay - Exactly 600px width, black background */}
+      <div className={`side-panel fixed top-0 right-0 h-full bg-brand-black z-40 w-[600px] ${isPanelOpen ? '' : 'translate-x-full'}`}>
+        <div className="h-full flex flex-col">
+          {/* Close Button - Positioned exactly as Figma: top-[39px], right-[52px] */}
+          <div className="absolute top-[39px] right-[52px]">
             <button 
               onClick={() => setIsPanelOpen(false)}
-              className="text-white font-display text-sm uppercase tracking-wider hover:opacity-70 transition-opacity"
+              className="text-white font-display text-[16px] font-bold hover:opacity-70 transition-opacity uppercase"
             >
-              Close
+              x
             </button>
           </div>
           
-          {/* Content */}
-          <div className="flex-grow flex flex-col justify-center">
-            <h2 className="font-display text-5xl md:text-6xl text-white mb-8">ABOUT</h2>
-            
-            <div className="space-y-6 text-white">
-              <p className="text-lg md:text-xl leading-relaxed max-w-2xl">
+          {/* Content - Padded ~60px from left edge */}
+          <div className="pl-[60px] pr-[52px] pt-[120px] pb-[52px]">
+            {/* ABOUT Section */}
+            <div className="mb-[250px]">
+              <h2 className="font-display text-[16px] text-white uppercase mb-6">ABOUT</h2>
+              <p className="font-display text-[14px] text-white uppercase leading-relaxed max-w-xs">
                 Creative developer specializing in brutalist design and geometric evolution. 
-                Transforming chaos into structured digital experiences through minimalist aesthetics.
+                Transforming chaos into structured digital experiences.
               </p>
-              
-              <p className="text-lg md:text-xl leading-relaxed max-w-2xl">
-                Based in Kyiv, Ukraine. Available for selective projects worldwide.
-              </p>
-              
-              <div className="mt-12 pt-8 border-t border-white/20">
-                <h3 className="font-display text-2xl mb-4">CONTACT</h3>
-                <div className="space-y-3">
-                  <a 
-                    href="mailto:mykytapolovianiuk.work@gmail.com"
-                    className="block text-white hover:opacity-70 transition-opacity text-lg"
-                  >
-                    mykytapolovianiuk.work@gmail.com
-                  </a>
-                  <a 
-                    href="https://instagram.com"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="block text-white hover:opacity-70 transition-opacity text-lg"
-                  >
-                    @mykpolo (Instagram)
-                  </a>
+            </div>
+            
+            {/* TECHNOLOGY Section */}
+            <div className="mb-[250px]">
+              <h3 className="font-display text-[16px] text-white uppercase mb-6">TECHNOLOGY</h3>
+              <div className="font-display text-[14px] text-white uppercase space-y-2">
+                <div>NEXT.JS</div>
+                <div>TYPESCRIPT</div>
+                <div>TAILWIND CSS</div>
+                <div>GSAP</div>
+                <div>THREE.JS</div>
+              </div>
+            </div>
+            
+            {/* EXPERIENCE Section */}
+            <div className="mb-[250px]">
+              <h3 className="font-display text-[16px] text-white uppercase mb-6">EXPERIENCE</h3>
+              <div className="font-display text-[14px] text-white uppercase space-y-4">
+                <div>
+                  <div>SENIOR FRONTEND DEVELOPER</div>
+                  <div className="text-white/70">2020-PRESENT</div>
                 </div>
+                <div>
+                  <div>CREATIVE DEVELOPER</div>
+                  <div className="text-white/70">2018-2020</div>
+                </div>
+              </div>
+            </div>
+            
+            {/* CONTACT Section */}
+            <div>
+              <h3 className="font-display text-[16px] text-white uppercase mb-6">CONTACT</h3>
+              <div className="font-display text-[14px] text-white uppercase space-y-3">
+                <a 
+                  href="mailto:mykytapolovianiuk.work@gmail.com"
+                  className="block hover:opacity-70 transition-opacity"
+                >
+                  EMAIL
+                </a>
+                <a 
+                  href="https://instagram.com"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="block hover:opacity-70 transition-opacity"
+                >
+                  INSTAGRAM
+                </a>
               </div>
             </div>
           </div>
@@ -94,7 +121,7 @@ export function Header() {
       {/* Backdrop */}
       {isPanelOpen && (
         <div 
-          className="fixed inset-0 bg-black bg-opacity-50 z-20"
+          className="fixed inset-0 bg-black bg-opacity-50 z-30"
           onClick={() => setIsPanelOpen(false)}
         />
       )}
