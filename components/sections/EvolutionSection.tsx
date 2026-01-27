@@ -4,6 +4,7 @@ import { useGSAP } from '@gsap/react';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { useRef } from 'react';
+import { generateShapes } from '../utils/geometry';
 
 // Register ScrollTrigger plugin
 if (typeof window !== 'undefined') {
@@ -16,6 +17,9 @@ export function EvolutionSection() {
   const wordsRef = useRef<(HTMLDivElement | null)[]>([]);
   const shapeRef = useRef<HTMLDivElement>(null);
   const finalTextRef = useRef<HTMLDivElement>(null);
+
+  // Generate mathematical shapes with 120 vertices each
+  const shapes = generateShapes();
 
   // Word data with their final positions forming a rectangle around center
   const wordsData = [
@@ -54,15 +58,14 @@ export function EvolutionSection() {
       scrollTrigger: {
         trigger: sectionRef.current,
         start: "top top",
-        end: "+=400%",
+        end: "+=500%",
         pin: true,
-        scrub: 1,
+        scrub: 0.5, // Add slight smoothing
         anticipatePin: 1
       }
     });
 
-    // STEP 1: Chaos -> Square Formation
-    // Animate words to form rectangle around center
+    // STEP 1: Chaos -> Order (Words assemble into rectangle)
     wordsRef.current.forEach((wordEl, i) => {
       if (wordEl) {
         tl.to(wordEl, {
@@ -76,62 +79,65 @@ export function EvolutionSection() {
       }
     });
 
-    // STEP 2: The Switch - Hide words/text, show shape as square
+    // STEP 2: The Singularity - Words vanish, Shape appears with Square state
     tl.to([nameRef.current, ...wordsRef.current.filter(Boolean)], {
       autoAlpha: 0,
       duration: 0.3
     }, 1.2);
 
-    // Show shape with initial square state
     tl.to(shapeRef.current, {
       autoAlpha: 1,
       duration: 0.3
     }, 1.3);
 
-    // Set initial square properties
+    // Set initial square state using mathematical 120-vertex polygon
     gsap.set(shapeRef.current, {
-      width: "16rem",
-      height: "16rem",
-      backgroundColor: "var(--color-brand-black)",
-      borderRadius: "0%",
-      clipPath: "inset(0% 0% 0% 0%)"
+      clipPath: shapes.square
     });
 
-    // STEP 3: Morph to Triangle
+    // STEP 3: Morph 1 (Square -> Triangle) - Liquid transition due to identical vertex count
     tl.to(shapeRef.current, {
-      clipPath: "polygon(50% 0%, 0% 100%, 100% 100%)",
-      duration: 1,
+      clipPath: shapes.triangle,
+      duration: 1.5,
       ease: "power2.inOut"
     }, 1.8);
 
-    // STEP 4: Morph to Circle
-    // Reset clip-path to full coverage and animate border-radius to 50%
+    // STEP 4: Morph 2 (Triangle -> Circle) - Perfect liquid morph
     tl.to(shapeRef.current, {
-      clipPath: "polygon(0% 0%, 100% 0%, 100% 100%, 0% 100%)",
-      borderRadius: "50%",
-      duration: 1,
+      clipPath: shapes.circle,
+      duration: 1.5,
       ease: "power2.inOut"
-    }, 3);
+    }, 3.5);
 
-    // STEP 5: Final Text Reveal
+    // STEP 5: Reveal final text
     tl.to(finalTextRef.current, {
       autoAlpha: 1,
       y: 0,
       duration: 0.8,
       ease: "power2.out"
-    }, 3.5);
+    }, 4.2);
+
+    // Heartbeat animation (independent, starts after circle formation)
+    tl.to(shapeRef.current, {
+      scale: 1.05,
+      repeat: -1,
+      yoyo: true,
+      duration: 0.6,
+      ease: "power1.inOut"
+    }, 5);
 
   }, []);
 
   return (
     <section 
       ref={sectionRef}
-      className="h-screen w-full bg-brand-white relative overflow-hidden flex items-center justify-center"
+      className="h-screen w-full bg-brand-white relative overflow-hidden"
     >
       {/* Center Name */}
       <div 
         ref={nameRef}
         className="absolute font-display font-bold text-5xl text-brand-black z-10"
+        style={{ top: '50%', left: '50%', transform: 'translate(-50%, -50%)' }}
       >
         Mykyta Polovianiuk
       </div>
@@ -147,17 +153,17 @@ export function EvolutionSection() {
         </div>
       ))}
 
-      {/* The Shape (Hero Element) - Single div that morphs through all states */}
+      {/* The Shape - Mathematical 120-vertex morphing element */}
       <div
         ref={shapeRef}
-        className="absolute z-20"
+        className="w-[300px] h-[300px] bg-brand-black absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-20"
       />
 
       {/* Final Text */}
       <div
         ref={finalTextRef}
         className="absolute font-display font-bold text-2xl text-brand-black z-30"
-        style={{ top: '75%', transform: 'translateY(20px)' }}
+        style={{ top: '75%', left: '50%', transform: 'translate(-50%, 20px)' }}
       >
         everything starts as a shape.
       </div>
