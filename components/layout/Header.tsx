@@ -45,59 +45,86 @@ export function Header() {
 
       {/* Side Panel Overlay - Exactly 600px width, black background */}
       <div className={`side-panel fixed top-0 right-0 h-full bg-brand-black z-40 w-[600px] ${isPanelOpen ? '' : 'translate-x-full'}`}>
-        <div className="h-full flex flex-col">
-          {/* Close Button - Positioned exactly as Figma: top-[39px], right-[52px] */}
-          <div className="absolute top-[39px] right-[52px]">
+        <div className="h-full relative">
+          {/* Close Button - Positioned exactly as Figma: top-[39px], right-[54px] */}
+          <div className="absolute top-[39px] right-[54px]">
             <button 
               onClick={() => setIsPanelOpen(false)}
-              className="text-white font-display text-[16px] font-bold hover:opacity-70 transition-opacity uppercase"
+              className="text-white font-display font-bold text-[16px] hover:opacity-70 transition-opacity uppercase"
             >
               x
             </button>
           </div>
           
-          {/* Content - Padded ~60px from left edge */}
-          <div className="pl-[60px] pr-[52px] pt-[120px] pb-[52px]">
-            {/* ABOUT Section */}
-            <div className="mb-[250px]">
-              <h2 className="font-display text-[16px] text-white uppercase mb-6">ABOUT</h2>
-              <p className="font-display text-[14px] text-white uppercase leading-relaxed max-w-xs">
-                Creative developer specializing in brutalist design and geometric evolution. 
-                Transforming chaos into structured digital experiences.
-              </p>
-            </div>
-            
-            {/* TECHNOLOGY Section */}
-            <div className="mb-[250px]">
-              <h3 className="font-display text-[16px] text-white uppercase mb-6">TECHNOLOGY</h3>
-              <div className="font-display text-[14px] text-white uppercase space-y-2">
-                <div>NEXT.JS</div>
-                <div>TYPESCRIPT</div>
-                <div>TAILWIND CSS</div>
-                <div>GSAP</div>
-                <div>THREE.JS</div>
-              </div>
-            </div>
-            
-            {/* EXPERIENCE Section */}
-            <div className="mb-[250px]">
-              <h3 className="font-display text-[16px] text-white uppercase mb-6">EXPERIENCE</h3>
-              <div className="font-display text-[14px] text-white uppercase space-y-4">
-                <div>
-                  <div>SENIOR FRONTEND DEVELOPER</div>
-                  <div className="text-white/70">2020-PRESENT</div>
-                </div>
-                <div>
-                  <div>CREATIVE DEVELOPER</div>
-                  <div className="text-white/70">2018-2020</div>
-                </div>
-              </div>
-            </div>
-            
-            {/* CONTACT Section */}
+          {/* Content - Padded ~43px from left edge as specified */}
+          <div className="absolute left-[43px] top-0 h-full flex flex-col justify-between py-[39px]">
+            {/* Menu Sections */}
             <div>
-              <h3 className="font-display text-[16px] text-white uppercase mb-6">CONTACT</h3>
-              <div className="font-display text-[14px] text-white uppercase space-y-3">
+              {/* ABOUT Section - top-[39px] */}
+              <div className="absolute top-[39px] font-display font-bold text-[16px] text-white uppercase">
+                about
+              </div>
+              
+              {/* Main Description - top-[105px], width 496px */}
+              <div className="absolute top-[105px] w-[496px]">
+                <p className="font-display font-bold text-[14px] text-white leading-relaxed">
+                  Creative developer specializing in brutalist design and geometric evolution. 
+                  Transforming chaos into structured digital experiences through minimalist aesthetics.
+                </p>
+              </div>
+              
+              {/* TECHNOLOGY Section - top-[245px] */}
+              <div className="absolute top-[245px]">
+                <h3 className="font-display font-bold text-[16px] text-white uppercase mb-6">TECHNOLOGY</h3>
+                
+                {/* Tech Stack - top-[311px] */}
+                <div className="absolute top-[311px] font-display font-bold text-[14px] text-white uppercase space-y-2">
+                  <div>REACT</div>
+                  <div>NEXT.JS</div>
+                  <div>TYPESCRIPT</div>
+                  <div>TAILWIND CSS</div>
+                  <div>GSAP</div>
+                </div>
+                
+                {/* Backend Stack - top-[379px] */}
+                <div className="absolute top-[379px] font-display font-bold text-[14px] text-white uppercase space-y-2">
+                  <div>NODE.JS</div>
+                  <div>EXPRESS</div>
+                  <div>MONGODB</div>
+                </div>
+                
+                {/* Tools - top-[447px] */}
+                <div className="absolute top-[447px] font-display font-bold text-[14px] text-white uppercase space-y-2">
+                  <div>FIGMA</div>
+                  <div>GITHUB</div>
+                  <div>VERCEL</div>
+                </div>
+              </div>
+              
+              {/* EXPERIENCE Section - top-[539px] */}
+              <div className="absolute top-[539px]">
+                <h3 className="font-display font-bold text-[16px] text-white uppercase mb-6">EXPERIENCE</h3>
+                <div className="font-display font-bold text-[14px] text-white uppercase space-y-4">
+                  <div>
+                    <div>SENIOR FRONTEND DEVELOPER</div>
+                    <div className="text-white/70">2020-PRESENT</div>
+                  </div>
+                  <div>
+                    <div>CREATIVE DEVELOPER</div>
+                    <div className="text-white/70">2018-2020</div>
+                  </div>
+                </div>
+              </div>
+              
+              {/* CONTACT Section - top-[783px] */}
+              <div className="absolute top-[783px]">
+                <h3 className="font-display font-bold text-[16px] text-white uppercase mb-6">contact</h3>
+              </div>
+            </div>
+            
+            {/* Social Links (bottom) - top-[903px] */}
+            <div className="absolute top-[903px]">
+              <div className="font-display font-bold text-[14px] text-white uppercase space-y-3">
                 <a 
                   href="mailto:mykytapolovianiuk.work@gmail.com"
                   className="block hover:opacity-70 transition-opacity"
@@ -111,6 +138,14 @@ export function Header() {
                   className="block hover:opacity-70 transition-opacity"
                 >
                   INSTAGRAM
+                </a>
+                <a 
+                  href="https://github.com"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="block hover:opacity-70 transition-opacity"
+                >
+                  GITHUB
                 </a>
               </div>
             </div>

@@ -61,7 +61,7 @@ export default function Home() {
         {/* Hero Section - White Background with Exact Figma Positioning */}
         <section className="relative min-h-screen bg-brand-white overflow-hidden">
           {/* Main Name - Positioned exactly as Figma: top-[436px], left-[52px] */}
-          <div className="hero-name absolute top-[436px] left-[52px]">
+          <div className="hero-name absolute top-[436px] left-[52px] z-10">
             <h1 className="font-display font-bold text-[128px] leading-[200px] text-brand-black md:text-[128px] text-[64px]">
               Mykyta Polovianiuk
             </h1>
@@ -83,31 +83,31 @@ export default function Home() {
           </div>
           
           {/* Footer Elements - Positioned exactly as Figma */}
-          {/* Email Link - bottom-[35px], left-[52px] */}
+          {/* Email Link - top-[969px], left-[52px] */}
           <a 
             href="mailto:mykytapolovianiuk.work@gmail.com"
-            className="absolute bottom-[35px] left-[52px] font-sans text-[16px] text-brand-black hover:underline transition-all lowercase"
+            className="absolute top-[969px] left-[52px] font-sans text-[16px] text-brand-black hover:underline transition-all lowercase"
           >
             mykytapolovianiuk.work@gmail.com
           </a>
           
-          {/* Instagram Link - bottom-[35px], right-[52px] */}
+          {/* Instagram Link - top-[969px], right-[~52px] */}
           <a 
             href="https://instagram.com"
             target="_blank"
             rel="noopener noreferrer"
-            className="absolute bottom-[35px] right-[52px] font-sans text-[16px] text-brand-black hover:underline transition-all lowercase"
+            className="absolute top-[969px] right-[52px] font-sans text-[16px] text-brand-black hover:underline transition-all lowercase"
           >
             @mykpolo
           </a>
           
-          {/* Location Text - bottom-[33px], centered */}
-          <div className="absolute bottom-[33px] left-1/2 transform -translate-x-1/2 font-sans text-[16px] text-brand-black">
+          {/* Location Text - top-[975px], centered */}
+          <div className="absolute top-[975px] left-1/2 transform -translate-x-1/2 font-sans text-[16px] text-brand-black">
             based in kyiv
           </div>
           
-          {/* Arrow Icon - centered, bottom-[120px] (approx top 885px) */}
-          <div className="absolute bottom-[120px] left-1/2 transform -translate-x-1/2">
+          {/* Arrow Icon - top-[885px], centered */}
+          <div className="absolute top-[885px] left-1/2 transform -translate-x-1/2">
             <svg 
               width="24" 
               height="24" 
