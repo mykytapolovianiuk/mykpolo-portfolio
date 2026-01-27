@@ -12,6 +12,10 @@ const config: Config = {
         'brand-black': '#000000',
         'brand-white': '#FFFFFF',
       },
+      fontFamily: {
+        'sans': ['General Sans', 'sans-serif'],
+        'display': ['Panchang', 'sans-serif'],
+      },
       container: {
         center: true,
         padding: {
