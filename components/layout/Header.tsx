@@ -1,30 +1,9 @@
 'use client';
 
-import { useState, useRef } from 'react';
-import { useGSAP } from '@gsap/react';
-import gsap from 'gsap';
+import { useState } from 'react';
 
 export function Header() {
   const [isPanelOpen, setIsPanelOpen] = useState(false);
-  const panelRef = useRef<HTMLDivElement>(null);
-
-  useGSAP(() => {
-    if (isPanelOpen) {
-      // Open: Move to 0%
-      gsap.to(panelRef.current, {
-        xPercent: 0,
-        duration: 0.8,
-        ease: 'power4.out',
-      });
-    } else {
-      // Close: Move to 100% (off screen)
-      gsap.to(panelRef.current, {
-        xPercent: 100,
-        duration: 0.6,
-        ease: 'power3.inOut',
-      });
-    }
-  }, [isPanelOpen]);
 
   return (
     <>
@@ -44,13 +23,10 @@ export function Header() {
         </button>
       </div>
 
-      {/* Sidebar - Fixed right, 600px width, black background */}
-      {/* CRITICAL: Initial transform: translateX(100%) to prevent black screen flash */}
-      <div 
-        ref={panelRef}
-        style={{ transform: 'translateX(100%)' }} 
-        className="fixed top-0 right-0 h-screen w-full md:w-[600px] bg-black z-[60] shadow-2xl"
-      >
+      {/* Sidebar - Fixed right, 600px width, black background with CSS transition */}
+      <div className={`fixed top-0 right-0 h-full w-full md:w-[600px] bg-black z-[60] shadow-2xl transition-transform duration-500 ease-in-out ${
+        isPanelOpen ? 'translate-x-0' : 'translate-x-full'
+      }`}>
         <div className="relative w-full h-full text-white">
           
           {/* Close Button */}
@@ -122,11 +98,11 @@ export function Header() {
         </div>
       </div>
 
-      {/* Backdrop */}
+      {/* Backdrop with CSS transition */}
       {isPanelOpen && (
         <div 
           onClick={() => setIsPanelOpen(false)}
-          className="fixed inset-0 bg-black/50 z-[55] backdrop-blur-sm transition-opacity duration-500"
+          className="fixed inset-0 bg-black/50 z-[55] backdrop-blur-sm transition-opacity duration-500 ease-in-out"
         />
       )}
     </>
