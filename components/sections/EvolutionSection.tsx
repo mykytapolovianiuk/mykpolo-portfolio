@@ -18,139 +18,168 @@ export function EvolutionSection() {
   const squareRef = useRef<HTMLDivElement>(null);
   const triangleRef = useRef<SVGSVGElement>(null);
   const circleRef = useRef<HTMLDivElement>(null);
-  const textRef = useRef<HTMLDivElement>(null);
+  const finalTextRef = useRef<HTMLDivElement>(null);
 
-  // Word data with their final positions
+  // Word data with their final rectangular positions
   const wordsData = [
-    { text: "Ideas", finalPos: { top: '15%', left: '50%', x: '-50%' } },
-    { text: "Technologies", finalPos: { top: '25%', right: '15%' } },
-    { text: "Requirements", finalPos: { bottom: '25%', right: '15%' } },
-    { text: "Code", finalPos: { bottom: '15%', left: '50%', x: '-50%' } },
-    { text: "Testing", finalPos: { bottom: '25%', left: '15%' } },
-    { text: "Iteration", finalPos: { top: '25%', left: '15%' } },
-    { text: "Design", finalPos: { top: '50%', left: '15%', y: '-50%' } }
+    { text: "Ideas", x: -200, y: -150 },
+    { text: "Code", x: 200, y: -150 },
+    { text: "Design", x: -200, y: 150 },
+    { text: "Tech", x: 200, y: 150 },
+    { text: "Process", x: -200, y: 0 },
+    { text: "Testing", x: 200, y: 0 },
+    { text: "Launch", x: 0, y: -150 },
+    { text: "Iterate", x: 0, y: 150 }
   ];
 
   useGSAP(() => {
     if (!sectionRef.current || !containerRef.current) return;
 
-    // Set initial positions for words (scattered)
+    // Set initial random positions for words (chaos state)
     wordsRef.current.forEach((wordEl, i) => {
       if (wordEl) {
         gsap.set(wordEl, {
-          x: (Math.random() - 0.5) * 400,
-          y: (Math.random() - 0.5) * 400,
-          scale: 0.8,
-          opacity: 0.5
+          x: (Math.random() - 0.5) * 800,
+          y: (Math.random() - 0.5) * 600,
+          opacity: 0.6,
+          scale: 0.8
         });
       }
     });
 
-    // Create timeline with ScrollTrigger
-    const tl = gsap.timeline({
+    // Hide shapes initially
+    gsap.set([squareRef.current, triangleRef.current, circleRef.current, finalTextRef.current], {
+      opacity: 0
+    });
+
+    // Create master timeline with ScrollTrigger
+    const masterTimeline = gsap.timeline({
       scrollTrigger: {
         trigger: sectionRef.current,
-        start: 'top top',
-        end: '+=300%',
-        scrub: 1,
+        start: "top top",
+        end: "+=400%",
         pin: true,
+        scrub: 1,
         anticipatePin: 1
       }
     });
 
-    // Phase 1: Chaos -> Order (Words form rectangle)
+    // STEP 1: Chaos to Order - Words form rectangle around center name
     wordsRef.current.forEach((wordEl, i) => {
       if (wordEl) {
-        const pos = wordsData[i]?.finalPos;
-        
-        tl.to(wordEl, {
-          left: pos?.left || 'auto',
-          right: pos?.right || 'auto',
-          top: pos?.top || 'auto',
-          bottom: pos?.bottom || 'auto',
-          xPercent: pos?.x ? -50 : (pos?.y ? -50 : 0),
-          yPercent: pos?.y ? -50 : 0,
-          scale: 1,
+        masterTimeline.to(wordEl, {
+          x: wordsData[i].x,
+          y: wordsData[i].y,
           opacity: 1,
+          scale: 1,
           duration: 1,
-          ease: 'power2.out'
+          ease: "power2.out"
         }, 0);
       }
     });
 
-    // Phase 2: The Snap (Hide words and name, show square)
-    tl.to([nameRef.current, ...wordsRef.current.filter(Boolean)], {
+    // STEP 2: The Switch - Hide words/name, show black square
+    masterTimeline.to([nameRef.current, ...wordsRef.current.filter(Boolean)], {
       opacity: 0,
-      duration: 0.1
+      duration: 0.1,
+      ease: "power1.in"
     }, 1);
 
-    tl.set(squareRef.current, {
-      opacity: 1
-    }, 1.1);
+    masterTimeline.fromTo(squareRef.current,
+      {
+        opacity: 0,
+        scale: 0.8
+      },
+      {
+        opacity: 1,
+        scale: 1,
+        duration: 0.3,
+        ease: "back.out(1.7)"
+      },
+      1.1
+    );
 
-    // Phase 3: Evolution (Square -> Triangle -> Circle)
-    // Square to Triangle
-    tl.to(squareRef.current, {
-      clipPath: 'polygon(50% 0%, 0% 100%, 100% 100%)',
-      duration: 0.8,
-      ease: 'power2.inOut'
-    }, 1.5);
+    // STEP 3: Morph 1 - Square to Triangle
+    masterTimeline.to(squareRef.current, {
+      opacity: 0,
+      duration: 0.2,
+      ease: "power2.in"
+    }, 2);
 
-    tl.set(triangleRef.current, {
-      opacity: 1
-    }, 1.5);
+    masterTimeline.fromTo(triangleRef.current,
+      {
+        opacity: 0,
+        scale: 0.8
+      },
+      {
+        opacity: 1,
+        scale: 1,
+        duration: 0.3,
+        ease: "back.out(1.7)"
+      },
+      2.1
+    );
 
-    tl.set(squareRef.current, {
-      opacity: 0
-    }, 1.5);
+    // STEP 4: Morph 2 - Triangle to Circle
+    masterTimeline.to(triangleRef.current, {
+      opacity: 0,
+      duration: 0.2,
+      ease: "power2.in"
+    }, 3);
 
-    // Triangle to Circle
-    tl.to(triangleRef.current, {
-      scale: 0.8,
-      duration: 0.8,
-      ease: 'power2.inOut'
-    }, 2.3);
+    masterTimeline.fromTo(circleRef.current,
+      {
+        opacity: 0,
+        scale: 0.8
+      },
+      {
+        opacity: 1,
+        scale: 1,
+        duration: 0.3,
+        ease: "back.out(1.7)"
+      },
+      3.1
+    );
 
-    tl.set(circleRef.current, {
-      opacity: 1
-    }, 2.3);
-
-    tl.set(triangleRef.current, {
-      opacity: 0
-    }, 2.3);
-
-    // Phase 4: Product (Circle beating + text fade in)
-    tl.to(circleRef.current, {
-      scale: 1.05,
-      repeat: -1,
-      yoyo: true,
-      duration: 0.5,
-      ease: 'power1.inOut'
-    }, 3.1);
-
-    tl.to(textRef.current, {
+    // STEP 5: Final - Fade in text
+    masterTimeline.to(finalTextRef.current, {
       opacity: 1,
       y: 0,
       duration: 0.8,
-      ease: 'power2.out'
-    }, 3.1);
+      ease: "power2.out"
+    }, 3.5);
+
+    // Heartbeat effect for circle (continuous when visible)
+    gsap.to(circleRef.current, {
+      scale: 1.05,
+      repeat: -1,
+      yoyo: true,
+      duration: 0.6,
+      ease: "power1.inOut",
+      paused: true,
+      onStart: function() {
+        // Only run when circle is visible
+        if (circleRef.current && parseFloat(getComputedStyle(circleRef.current).opacity) > 0.5) {
+          this.play();
+        }
+      }
+    });
 
   }, []);
 
   return (
     <section 
-      ref={sectionRef} 
-      className="h-screen w-full relative bg-brand-white overflow-hidden"
+      ref={sectionRef}
+      className="h-screen w-full bg-brand-white relative overflow-hidden"
     >
       <div 
         ref={containerRef}
         className="fixed top-0 left-0 w-full h-screen flex items-center justify-center"
       >
-        {/* Central Name */}
+        {/* Center Name */}
         <div 
           ref={nameRef}
-          className="absolute font-display font-bold text-[4rem] text-brand-black z-10"
-          style={{ top: '50%', left: '50%', transform: 'translate(-50%, -50%)' }}
+          className="absolute font-display font-bold text-5xl text-brand-black z-10"
         >
           Mykyta Polovianiuk
         </div>
@@ -160,44 +189,41 @@ export function EvolutionSection() {
           <div
             key={word.text}
             ref={(el) => { wordsRef.current[index] = el; }}
-            className="absolute font-display font-bold text-[1.5rem] text-brand-black whitespace-nowrap z-10"
+            className="absolute font-display font-bold text-xl text-brand-black whitespace-nowrap z-10"
           >
             {word.text}
           </div>
         ))}
 
-        {/* Solid Black Square */}
+        {/* Black Square */}
         <div
           ref={squareRef}
-          className="absolute w-64 h-64 bg-brand-black opacity-0 z-20"
-          style={{ top: '50%', left: '50%', transform: 'translate(-50%, -50%)' }}
+          className="absolute w-48 h-48 bg-brand-black z-20"
         />
 
-        {/* Solid Black Triangle */}
+        {/* Black Triangle */}
         <svg
           ref={triangleRef}
-          className="absolute w-64 h-64 text-brand-black opacity-0 z-20"
-          style={{ top: '50%', left: '50%', transform: 'translate(-50%, -50%)' }}
+          className="absolute w-48 h-48 text-brand-black z-20"
           viewBox="0 0 100 100"
         >
           <polygon 
-            points="50,0 0,100 100,100" 
+            points="50,10 10,90 90,90" 
             fill="currentColor"
           />
         </svg>
 
-        {/* Solid Black Circle */}
+        {/* Black Circle */}
         <div
           ref={circleRef}
-          className="absolute w-64 h-64 bg-brand-black rounded-full opacity-0 z-20"
-          style={{ top: '50%', left: '50%', transform: 'translate(-50%, -50%)' }}
+          className="absolute w-48 h-48 bg-brand-black rounded-full z-20"
         />
 
         {/* Final Text */}
         <div
-          ref={textRef}
-          className="absolute font-display font-bold text-[2rem] text-brand-black opacity-0 z-30"
-          style={{ top: '75%', left: '50%', transform: 'translate(-50%, 20px)' }}
+          ref={finalTextRef}
+          className="absolute font-display font-bold text-2xl text-brand-black z-30"
+          style={{ top: '70%' }}
         >
           everything starts as a shape.
         </div>
