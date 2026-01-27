@@ -12,26 +12,25 @@ if (typeof window !== 'undefined') {
 
 export function EvolutionSection() {
   const sectionRef = useRef<HTMLDivElement>(null);
-  const containerRef = useRef<HTMLDivElement>(null);
   const nameRef = useRef<HTMLDivElement>(null);
   const wordsRef = useRef<(HTMLDivElement | null)[]>([]);
   const shapeRef = useRef<HTMLDivElement>(null);
   const finalTextRef = useRef<HTMLDivElement>(null);
 
-  // Word data with their final square positions
+  // Word data with their final positions forming a rectangle around center
   const wordsData = [
-    { text: "Ideas", x: -150, y: -150 },
-    { text: "Code", x: 150, y: -150 },
-    { text: "Design", x: -150, y: 150 },
-    { text: "Tech", x: 150, y: 150 },
-    { text: "Process", x: -150, y: 0 },
-    { text: "Testing", x: 150, y: 0 },
-    { text: "Launch", x: 0, y: -150 },
-    { text: "Iterate", x: 0, y: 150 }
+    { text: "Ideas", x: -200, y: -120 },
+    { text: "Code", x: 200, y: -120 },
+    { text: "Design", x: -200, y: 120 },
+    { text: "Tech", x: 200, y: 120 },
+    { text: "Process", x: -200, y: 0 },
+    { text: "Testing", x: 200, y: 0 },
+    { text: "Launch", x: 0, y: -120 },
+    { text: "Iterate", x: 0, y: 120 }
   ];
 
   useGSAP(() => {
-    if (!sectionRef.current || !containerRef.current || !shapeRef.current) return;
+    if (!sectionRef.current) return;
 
     // Set initial random positions for words (chaos state)
     wordsRef.current.forEach((wordEl, i) => {
@@ -47,133 +46,120 @@ export function EvolutionSection() {
 
     // Hide shape and final text initially
     gsap.set([shapeRef.current, finalTextRef.current], {
-      opacity: 0
+      autoAlpha: 0
     });
 
-    // Create master timeline with ScrollTrigger
-    const masterTimeline = gsap.timeline({
+    // Create timeline with ScrollTrigger
+    const tl = gsap.timeline({
       scrollTrigger: {
         trigger: sectionRef.current,
         start: "top top",
-        end: "+=600%", // Increased scroll duration for heavier feel
+        end: "+=400%",
         pin: true,
-        scrub: 0.5, // Slower scrub for deliberate feel
+        scrub: 1,
         anticipatePin: 1
       }
     });
 
-    // STEP 1: Words Assembly - Chaos to tight square formation
+    // STEP 1: Chaos -> Square Formation
+    // Animate words to form rectangle around center
     wordsRef.current.forEach((wordEl, i) => {
       if (wordEl) {
-        masterTimeline.to(wordEl, {
+        tl.to(wordEl, {
           x: wordsData[i].x,
           y: wordsData[i].y,
           opacity: 1,
           scale: 1,
-          duration: 1.5,
-          ease: "power2.inOut"
+          duration: 1,
+          ease: "power2.out"
         }, 0);
       }
     });
 
-    // STEP 2: The Swap - Hide words/name, show shape as square
-    masterTimeline.to([nameRef.current, ...wordsRef.current.filter(Boolean)], {
-      opacity: 0,
-      duration: 0.2,
-      ease: "power1.in"
-    }, 1.8);
+    // STEP 2: The Switch - Hide words/text, show shape as square
+    tl.to([nameRef.current, ...wordsRef.current.filter(Boolean)], {
+      autoAlpha: 0,
+      duration: 0.3
+    }, 1.2);
 
-    masterTimeline.to(shapeRef.current, {
-      opacity: 1,
-      duration: 0.3,
-      ease: "power2.out"
-    }, 2);
+    // Show shape with initial square state
+    tl.to(shapeRef.current, {
+      autoAlpha: 1,
+      duration: 0.3
+    }, 1.3);
 
-    // Set initial square state
+    // Set initial square properties
     gsap.set(shapeRef.current, {
-      width: "12rem",
-      height: "12rem",
+      width: "16rem",
+      height: "16rem",
       backgroundColor: "var(--color-brand-black)",
       borderRadius: "0%",
-      clipPath: "polygon(0% 0%, 100% 0%, 100% 100%, 0% 100%)"
+      clipPath: "inset(0% 0% 0% 0%)"
     });
 
     // STEP 3: Morph to Triangle
-    masterTimeline.to(shapeRef.current, {
-      clipPath: "polygon(50% 0%, 100% 100%, 0% 100%)",
-      duration: 1.2,
-      ease: "power2.inOut"
-    }, 2.5);
-
-    // STEP 4: Text Reveal starts during triangle phase
-    masterTimeline.to(finalTextRef.current, {
-      opacity: 1,
-      y: 0,
+    tl.to(shapeRef.current, {
+      clipPath: "polygon(50% 0%, 0% 100%, 100% 100%)",
       duration: 1,
-      ease: "power2.out"
+      ease: "power2.inOut"
+    }, 1.8);
+
+    // STEP 4: Morph to Circle
+    // Reset clip-path to full coverage and animate border-radius to 50%
+    tl.to(shapeRef.current, {
+      clipPath: "polygon(0% 0%, 100% 0%, 100% 100%, 0% 100%)",
+      borderRadius: "50%",
+      duration: 1,
+      ease: "power2.inOut"
     }, 3);
 
-    // STEP 5: Morph to Circle
-    masterTimeline.to(shapeRef.current, {
-      borderRadius: "50%",
-      clipPath: "polygon(0% 0%, 100% 0%, 100% 100%, 0% 100%)", // Reset to full square for circle
-      duration: 1.2,
-      ease: "power2.inOut"
-    }, 3.8);
-
-    // STEP 6: Heartbeat effect (starts when circle is fully formed)
-    masterTimeline.to(shapeRef.current, {
-      scale: 1.08,
-      repeat: -1,
-      yoyo: true,
-      duration: 0.7,
-      ease: "power1.inOut"
-    }, 5);
+    // STEP 5: Final Text Reveal
+    tl.to(finalTextRef.current, {
+      autoAlpha: 1,
+      y: 0,
+      duration: 0.8,
+      ease: "power2.out"
+    }, 3.5);
 
   }, []);
 
   return (
     <section 
       ref={sectionRef}
-      className="h-screen w-full bg-brand-white relative overflow-hidden"
+      className="h-screen w-full bg-brand-white relative overflow-hidden flex items-center justify-center"
     >
+      {/* Center Name */}
       <div 
-        ref={containerRef}
-        className="fixed top-0 left-0 w-full h-screen flex items-center justify-center"
+        ref={nameRef}
+        className="absolute font-display font-bold text-5xl text-brand-black z-10"
       >
-        {/* Center Name */}
-        <div 
-          ref={nameRef}
-          className="absolute font-display font-bold text-5xl text-brand-black z-10"
-        >
-          Mykyta Polovianiuk
-        </div>
+        Mykyta Polovianiuk
+      </div>
 
-        {/* Floating Words */}
-        {wordsData.map((word, index) => (
-          <div
-            key={word.text}
-            ref={(el) => { wordsRef.current[index] = el; }}
-            className="absolute font-display font-bold text-xl text-brand-black whitespace-nowrap z-10"
-          >
-            {word.text}
-          </div>
-        ))}
-
-        {/* Morphing Shape Element - SINGLE element for true morphing */}
+      {/* Floating Words */}
+      {wordsData.map((word, index) => (
         <div
-          ref={shapeRef}
-          className="absolute z-20"
-        />
-
-        {/* Final Text */}
-        <div
-          ref={finalTextRef}
-          className="absolute font-display font-bold text-2xl text-brand-black z-30"
-          style={{ top: '75%', transform: 'translateY(20px)' }}
+          key={word.text}
+          ref={(el) => { wordsRef.current[index] = el; }}
+          className="absolute font-display font-bold text-xl text-brand-black whitespace-nowrap z-10"
         >
-          everything starts as a shape.
+          {word.text}
         </div>
+      ))}
+
+      {/* The Shape (Hero Element) - Single div that morphs through all states */}
+      <div
+        ref={shapeRef}
+        className="absolute z-20"
+      />
+
+      {/* Final Text */}
+      <div
+        ref={finalTextRef}
+        className="absolute font-display font-bold text-2xl text-brand-black z-30"
+        style={{ top: '75%', transform: 'translateY(20px)' }}
+      >
+        everything starts as a shape.
       </div>
     </section>
   );
