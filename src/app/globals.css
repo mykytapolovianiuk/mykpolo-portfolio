@@ -3,8 +3,6 @@
 @theme inline {
   --color-brand-black: #000000;
   --color-brand-white: #FFFFFF;
-  --animate-scroll-up: scroll-up 2s linear infinite;
-  --animate-scroll-down: scroll-down 2s linear infinite
 }
 
 body, a { 

@@ -79,7 +79,7 @@ export function Header() {
                          </div>
                       </div>
                       <div className="flex gap-4">
-                         <span className="w-[80px]">2023-24</span>
+                         <span className="w-[80px]">2023-2024</span>
                          <div>Freelance Web Developer</div>
                       </div>
                    </div>
@@ -102,7 +102,7 @@ export function Header() {
       {isPanelOpen && (
         <div 
           onClick={() => setIsPanelOpen(false)}
-          className="fixed inset-0 bg-black/50 z-[55] backdrop-blur-sm transition-opacity duration-500 ease-in-out"
+          className="fixed inset-0 bg-black/50 z-[55]  transition-opacity duration-500 ease-in-out"
         />
       )}
     </>

@@ -25,6 +25,12 @@ export function LoadingScreen({ onComplete }: LoadingScreenProps) {
 
   useGSAP(() => {
     if (!isVisible) {
+      // Guard against null refs
+      if (!leftPanelRef.current || !rightPanelRef.current || !containerRef.current) {
+        setTimeout(onComplete, 100);
+        return;
+      }
+
       // Animate curtain open on exit
       const tl = gsap.timeline({
         onComplete: () => {
