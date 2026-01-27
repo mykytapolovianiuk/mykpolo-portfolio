@@ -7,22 +7,6 @@ import gsap from 'gsap';
 export function Header() {
   const [isPanelOpen, setIsPanelOpen] = useState(false);
 
-  useGSAP(() => {
-    if (isPanelOpen) {
-      gsap.to('.side-panel', {
-        xPercent: 0,
-        duration: 0.6,
-        ease: 'power3.out'
-      });
-    } else {
-      gsap.to('.side-panel', {
-        xPercent: 100,
-        duration: 0.6,
-        ease: 'power3.inOut'
-      });
-    }
-  }, [isPanelOpen]);
-
   return (
     <>
       {/* Fixed Logo and Menu Trigger - Absolute positioning to match Figma */}
@@ -43,8 +27,8 @@ export function Header() {
         </button>
       </div>
 
-      {/* Side Panel Overlay - Exactly 600px width, black background */}
-      <div className={`side-panel fixed top-0 right-0 h-full bg-brand-black z-40 w-[600px] ${isPanelOpen ? '' : 'translate-x-full'}`}>
+      {/* Side Panel Overlay - Fixed 600px width sidebar */}
+      <div className={`fixed top-0 right-0 h-full bg-brand-black z-50 w-[600px] max-w-full transform transition-transform duration-600 ease-out ${isPanelOpen ? 'translate-x-0' : 'translate-x-full'}`}>
         <div className="h-full relative">
           {/* Close Button - Positioned exactly as Figma: top-[39px], right-[54px] */}
           <div className="absolute top-[39px] right-[54px]">
@@ -68,8 +52,7 @@ export function Header() {
               {/* Main Description - top-[105px], width 496px */}
               <div className="absolute top-[105px] w-[496px]">
                 <p className="font-display font-bold text-[14px] text-white leading-relaxed">
-                  Creative developer specializing in brutalist design and geometric evolution. 
-                  Transforming chaos into structured digital experiences through minimalist aesthetics.
+                  Full-stack developer based in Kyiv, creating digital experiences with attention to detail and modern technologies.
                 </p>
               </div>
               
@@ -77,41 +60,48 @@ export function Header() {
               <div className="absolute top-[245px]">
                 <h3 className="font-display font-bold text-[16px] text-white uppercase mb-6">TECHNOLOGY</h3>
                 
-                {/* Tech Stack - top-[311px] */}
-                <div className="absolute top-[311px] font-display font-bold text-[14px] text-white uppercase space-y-2">
-                  <div>REACT</div>
-                  <div>NEXT.JS</div>
-                  <div>TYPESCRIPT</div>
-                  <div>TAILWIND CSS</div>
-                  <div>GSAP</div>
+                {/* Frontend - top-[311px] */}
+                <div className="absolute top-[311px]">
+                  <div className="font-display font-bold text-[14px] text-white uppercase mb-2">Frontend</div>
+                  <div className="font-display font-bold text-[14px] text-white">
+                    React, Next.js, TypeScript, Wordpress, shopify, Tailwind CSS
+                  </div>
                 </div>
                 
-                {/* Backend Stack - top-[379px] */}
-                <div className="absolute top-[379px] font-display font-bold text-[14px] text-white uppercase space-y-2">
-                  <div>NODE.JS</div>
-                  <div>EXPRESS</div>
-                  <div>MONGODB</div>
+                {/* Backend - top-[379px] */}
+                <div className="absolute top-[379px]">
+                  <div className="font-display font-bold text-[14px] text-white uppercase mb-2">Backend</div>
+                  <div className="font-display font-bold text-[14px] text-white">
+                    Node.js, Express, MongoDB, firebase, Supabase, PHP
+                  </div>
                 </div>
                 
                 {/* Tools - top-[447px] */}
-                <div className="absolute top-[447px] font-display font-bold text-[14px] text-white uppercase space-y-2">
-                  <div>FIGMA</div>
-                  <div>GITHUB</div>
-                  <div>VERCEL</div>
+                <div className="absolute top-[447px]">
+                  <div className="font-display font-bold text-[14px] text-white uppercase mb-2">Tools</div>
+                  <div className="font-display font-bold text-[14px] text-white">
+                    Git, Figma, Framer, GSAP, Photoshop, ai
+                  </div>
                 </div>
               </div>
               
               {/* EXPERIENCE Section - top-[539px] */}
               <div className="absolute top-[539px]">
                 <h3 className="font-display font-bold text-[16px] text-white uppercase mb-6">EXPERIENCE</h3>
-                <div className="font-display font-bold text-[14px] text-white uppercase space-y-4">
-                  <div>
-                    <div>SENIOR FRONTEND DEVELOPER</div>
-                    <div className="text-white/70">2020-PRESENT</div>
+                
+                {/* Experience 1 - top-[589px] */}
+                <div className="absolute top-[589px]">
+                  <div className="font-display font-bold text-[14px] text-white/70 mb-2">2025</div>
+                  <div className="font-display font-bold text-[14px] text-white">
+                    Freelance Full-stack Developer & Frontend Developer Web Agency
                   </div>
-                  <div>
-                    <div>CREATIVE DEVELOPER</div>
-                    <div className="text-white/70">2018-2020</div>
+                </div>
+                
+                {/* Experience 2 - top-[675px] */}
+                <div className="absolute top-[675px]">
+                  <div className="font-display font-bold text-[14px] text-white/70 mb-2">2023-2024</div>
+                  <div className="font-display font-bold text-[14px] text-white">
+                    Freelance web Developer
                   </div>
                 </div>
               </div>
@@ -122,30 +112,32 @@ export function Header() {
               </div>
             </div>
             
-            {/* Social Links (bottom) - top-[903px] */}
+            {/* Social Links (bottom) - top-[903px] with specific hrefs */}
             <div className="absolute top-[903px]">
-              <div className="font-display font-bold text-[14px] text-white uppercase space-y-3">
+              <div className="font-display font-bold text-[14px] text-white space-y-3">
                 <a 
-                  href="mailto:mykytapolovianiuk.work@gmail.com"
-                  className="block hover:opacity-70 transition-opacity"
-                >
-                  EMAIL
-                </a>
-                <a 
-                  href="https://instagram.com"
+                  href="https://instagram.com/shinjiwwww"
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="block hover:opacity-70 transition-opacity"
+                  className="block hover:opacity-70 transition-opacity uppercase"
                 >
-                  INSTAGRAM
+                  instagram
                 </a>
                 <a 
-                  href="https://github.com"
+                  href="https://linkedin.com"
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="block hover:opacity-70 transition-opacity"
+                  className="block hover:opacity-70 transition-opacity uppercase"
                 >
-                  GITHUB
+                  linkedin
+                </a>
+                <a 
+                  href="https://github.com/mykytapolovianiuk"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="block hover:opacity-70 transition-opacity uppercase"
+                >
+                  github
                 </a>
               </div>
             </div>
@@ -156,7 +148,7 @@ export function Header() {
       {/* Backdrop */}
       {isPanelOpen && (
         <div 
-          className="fixed inset-0 bg-black bg-opacity-50 z-30"
+          className="fixed inset-0 bg-black bg-opacity-50 z-40"
           onClick={() => setIsPanelOpen(false)}
         />
       )}
