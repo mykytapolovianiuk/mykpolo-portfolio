@@ -5,6 +5,7 @@ import { useGSAP } from '@gsap/react';
 import gsap from 'gsap';
 import { LoadingScreen } from '@/components/ui/LoadingScreen';
 import { Header } from '@/components/layout/Header';
+import { EvolutionSection } from '@/components/sections/EvolutionSection';
 
 export default function Home() {
   const [isLoading, setIsLoading] = useState(true);
@@ -98,15 +99,8 @@ export default function Home() {
           </div>
         </section>
 
-        {/* Work Section Placeholder */}
-        <section className="min-h-screen bg-brand-white flex items-center justify-center">
-          <div className="text-center">
-            <h2 className="font-display text-4xl mb-8 text-brand-black">WORK</h2>
-            <p className="max-w-2xl mx-auto text-lg text-brand-black">
-              Portfolio projects coming soon...
-            </p>
-          </div>
-        </section>
+        {/* Evolution Section - Chaos to Structure to Product */}
+        <EvolutionSection />
       </div>
     </>
   );

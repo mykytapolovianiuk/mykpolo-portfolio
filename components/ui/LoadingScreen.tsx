@@ -50,44 +50,42 @@ export function LoadingScreen({ onComplete }: LoadingScreenProps) {
     }
   }, [isVisible]);
 
-  // Conveyor Belt Generator - Doubled content to prevent gaps
-  const ConveyorBelt = ({ direction }: { direction: 'up' | 'down' }) => {
-    // Create doubled content array to ensure seamless looping
-    const baseContent = Array(20).fill("MYK POLO MYKPOLO");
-    const doubledContent = [...baseContent, ...baseContent]; // Double it for gapless loop
-    
-    return (
-      <div className="relative h-screen overflow-hidden flex-1 flex justify-center">
-        {/* Animated container with doubled content */}
-        <div className={`flex flex-col items-center ${direction === 'down' ? 'animate-infinite-scroll-down' : 'animate-infinite-scroll-up'}`}>
-          {doubledContent.map((text, i) => (
-            <div 
-              key={i} 
-              className="font-display font-bold text-[6vh] leading-[0.85] text-brand-black tracking-tight uppercase"
-            >
-              {text}
-            </div>
-          ))}
+  // Text Block Component - Dense repeating text
+  const TextBlock = () => (
+    <>
+      {Array(20).fill("MYK POLO").map((t, i) => (
+        <div key={i} className="whitespace-nowrap font-display font-bold text-[10vh] leading-[0.8] text-brand-black tracking-tighter uppercase select-none">
+          {t}
         </div>
+      ))}
+    </>
+  );
+
+  // Column Component with seamless looping
+  const Column = ({ direction }: { direction: 'up' | 'down' }) => (
+    <div className="relative h-screen overflow-hidden flex-1 flex justify-center">
+      <div className={direction === 'down' ? 'animate-infinite-scroll-down' : 'animate-infinite-scroll-up'}>
+        <TextBlock />
+        <TextBlock /> {/* Duplicate for seamless loop */}
       </div>
-    );
-  };
+    </div>
+  );
 
   if (!isVisible) return null;
 
   return (
     <div ref={containerRef} className="fixed inset-0 z-50 flex bg-brand-white">
-      {/* Left Panel - Moves DOWN */}
+      {/* Left Panel - Scrolls DOWN */}
       <div ref={leftPanelRef} className="w-1/2 h-full bg-brand-white border-r border-brand-black/10 overflow-hidden flex items-center">
-        <div className="w-full flex justify-center gap-4 opacity-80">
-          <ConveyorBelt direction="down" />
+        <div className="w-full flex justify-center opacity-90">
+          <Column direction="down" />
         </div>
       </div>
 
-      {/* Right Panel - Moves UP */}
+      {/* Right Panel - Scrolls UP */}
       <div ref={rightPanelRef} className="w-1/2 h-full bg-brand-white overflow-hidden flex items-center">
-        <div className="w-full flex justify-center gap-4 opacity-80">
-          <ConveyorBelt direction="up" />
+        <div className="w-full flex justify-center opacity-90">
+          <Column direction="up" />
         </div>
       </div>
     </div>
