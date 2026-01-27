@@ -18,3 +18,12 @@ h1, h2, h3, .font-display {
 /* Utility for hiding scrollbar */
 .no-scrollbar::-webkit-scrollbar { display: none; }
 .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+
+/* Ensure proper layering */
+.loading-screen {
+  z-index: 50;
+}
+
+.side-panel {
+  z-index: 40;
+}

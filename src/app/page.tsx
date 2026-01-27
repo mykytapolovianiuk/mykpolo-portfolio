@@ -20,12 +20,14 @@ export default function Home() {
       tl.fromTo('.hero-triangle',
         {
           scale: 0,
-          opacity: 0
+          opacity: 0,
+          rotation: -180
         },
         {
           scale: 1,
           opacity: 1,
-          duration: 1,
+          rotation: 0,
+          duration: 1.2,
           ease: 'back.out(1.7)'
         }
       );
@@ -33,11 +35,11 @@ export default function Home() {
       // Animate name parts
       tl.fromTo('.hero-name-top',
         {
-          y: 30,
+          x: -50,
           opacity: 0
         },
         {
-          y: 0,
+          x: 0,
           opacity: 1,
           duration: 0.8,
           ease: 'power2.out'
@@ -47,31 +49,16 @@ export default function Home() {
 
       tl.fromTo('.hero-name-bottom',
         {
-          y: -30,
+          x: 50,
           opacity: 0
         },
         {
-          y: 0,
+          x: 0,
           opacity: 1,
           duration: 0.8,
           ease: 'power2.out'
         },
         '-=0.7'
-      );
-
-      // Animate footer elements
-      tl.fromTo('.hero-footer',
-        {
-          y: 20,
-          opacity: 0
-        },
-        {
-          y: 0,
-          opacity: 1,
-          duration: 0.8,
-          ease: 'power2.out'
-        },
-        '-=0.5'
       );
     }
   }, [isLoading]);
@@ -87,51 +74,73 @@ export default function Home() {
         
         {/* Hero Section - White Background */}
         <section className="min-h-screen bg-brand-white flex flex-col items-center justify-center relative px-6 overflow-hidden">
-          <div className="text-center">
-            {/* Name Top */}
-            <div className="hero-name-top font-display text-5xl md:text-7xl font-bold mb-2 text-brand-black">
+          <div className="text-center relative">
+            {/* Name Top Left of Triangle */}
+            <div className="hero-name-top font-display text-4xl md:text-6xl font-bold mb-8 text-brand-black absolute -top-16 left-1/2 transform -translate-x-1/2 -translate-y-full">
               Mykyta
             </div>
             
             {/* Black Triangle */}
-            <div className="hero-triangle my-4">
+            <div className="hero-triangle my-8">
               <svg 
-                width="100" 
-                height="87" 
-                viewBox="0 0 100 87" 
+                width="120" 
+                height="104" 
+                viewBox="0 0 120 104" 
                 className="mx-auto"
               >
                 <polygon 
-                  points="50,0 0,87 100,87" 
+                  points="60,0 0,104 120,104" 
                   fill="currentColor" 
                   className="text-brand-black"
                 />
               </svg>
             </div>
             
-            {/* Name Bottom */}
-            <div className="hero-name-bottom font-display text-5xl md:text-7xl font-bold mt-2 text-brand-black">
+            {/* Name Bottom Right of Triangle */}
+            <div className="hero-name-bottom font-display text-4xl md:text-6xl font-bold mt-8 text-brand-black absolute -bottom-16 left-1/2 transform -translate-x-1/2 translate-y-full">
               Polovianiuk
             </div>
           </div>
           
-          {/* Footer with Arrow and Location */}
-          <div className="hero-footer absolute bottom-12 left-1/2 transform -translate-x-1/2 flex flex-col items-center">
-            <div className="w-px h-8 bg-brand-black mb-4"></div>
-            <svg 
-              width="24" 
-              height="24" 
-              viewBox="0 0 24 24" 
-              className="text-brand-black mb-2"
-            >
-              <path 
-                d="M7 10l5 5 5-5z" 
-                fill="currentColor"
-              />
-            </svg>
-            <span className="text-sm font-sans text-brand-black uppercase tracking-widest">
-              based in Kyiv
-            </span>
+          {/* Footer with Links */}
+          <div className="absolute bottom-8 left-0 right-0 px-6">
+            <div className="flex justify-between items-center">
+              {/* Email Link */}
+              <a 
+                href="mailto:mykytapolovianiuk.work@gmail.com"
+                className="text-sm font-sans text-brand-black hover:opacity-70 transition-opacity lowercase"
+              >
+                Email
+              </a>
+              
+              {/* Center Arrow and Location */}
+              <div className="flex flex-col items-center">
+                <svg 
+                  width="20" 
+                  height="20" 
+                  viewBox="0 0 24 24" 
+                  className="text-brand-black mb-1"
+                >
+                  <path 
+                    d="M7 10l5 5 5-5z" 
+                    fill="currentColor"
+                  />
+                </svg>
+                <span className="text-xs font-sans text-brand-black lowercase">
+                  based in kyiv
+                </span>
+              </div>
+              
+              {/* Instagram Link */}
+              <a 
+                href="https://instagram.com"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-sm font-sans text-brand-black hover:opacity-70 transition-opacity lowercase"
+              >
+                Instagram
+              </a>
+            </div>
           </div>
         </section>
 

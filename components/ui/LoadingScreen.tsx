@@ -2,23 +2,56 @@
 
 import { useGSAP } from '@gsap/react';
 import gsap from 'gsap';
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 
 interface LoadingScreenProps {
   onComplete: () => void;
 }
 
 export function LoadingScreen({ onComplete }: LoadingScreenProps) {
+  const [isReady, setIsReady] = useState(false);
+
+  // Real loading check
+  useEffect(() => {
+    const handleLoad = () => {
+      setTimeout(() => {
+        setIsReady(true);
+      }, 2000); // Minimum 2 seconds
+    };
+
+    if (document.readyState === 'complete') {
+      handleLoad();
+    } else {
+      window.addEventListener('load', handleLoad);
+    }
+
+    return () => {
+      window.removeEventListener('load', handleLoad);
+    };
+  }, []);
+
   useGSAP(() => {
-    // Create ticker animations for each row
-    const rows = gsap.utils.toArray('.ticker-row') as HTMLElement[];
+    if (!isReady) return;
+
+    // Create vertical column animations
+    const leftColumns = gsap.utils.toArray('.left-panel .scroll-column') as HTMLElement[];
+    const rightColumns = gsap.utils.toArray('.right-panel .scroll-column') as HTMLElement[];
     
-    rows.forEach((row, index) => {
-      const direction = index % 2 === 0 ? 1 : -1; // Even rows go right, odd rows go left
-      
-      gsap.to(row, {
-        xPercent: direction * 100,
-        duration: 15,
+    // Left panel columns scroll UP
+    leftColumns.forEach((column, index) => {
+      gsap.to(column, {
+        yPercent: -100,
+        duration: 8,
+        repeat: -1,
+        ease: 'none'
+      });
+    });
+
+    // Right panel columns scroll DOWN
+    rightColumns.forEach((column, index) => {
+      gsap.to(column, {
+        yPercent: 100,
+        duration: 8,
         repeat: -1,
         ease: 'none'
       });
@@ -26,35 +59,50 @@ export function LoadingScreen({ onComplete }: LoadingScreenProps) {
 
     // Curtain exit animation
     const tl = gsap.timeline({
-      delay: 3, // Show for 3 seconds
+      delay: 0.5,
       onComplete: () => {
         setTimeout(onComplete, 300);
       }
     });
 
-    tl.to('.loading-screen', {
-      yPercent: -100,
+    tl.to('.left-panel', {
+      xPercent: -100,
       duration: 1.2,
       ease: 'power3.inOut'
-    });
-  }, []);
+    }, 0);
 
-  // Generate 12 rows of ticker text
-  const tickerRows = Array(12).fill(null).map((_, index) => (
-    `POLO MYKPOLO MYKPOLO POLO MYKPOLO MYKPOLO POLO MYKPOLO MYKPOLO POLO MYKPOLO MYKPOLO`
-  ));
+    tl.to('.right-panel', {
+      xPercent: 100,
+      duration: 1.2,
+      ease: 'power3.inOut'
+    }, 0);
+  }, [isReady]);
+
+  // Generate columns of text
+  const generateColumns = (count: number) => {
+    return Array(count).fill(null).map((_, index) => (
+      <div key={index} className="scroll-column whitespace-nowrap font-display text-white text-3xl font-bold uppercase tracking-wider">
+        {Array(20).fill("POLO MYKPOLO").join(" ")}
+      </div>
+    ));
+  };
+
+  if (!isReady) return null;
 
   return (
-    <div className="loading-screen fixed inset-0 z-50 bg-brand-black overflow-hidden">
-      <div className="h-full flex flex-col justify-center">
-        {tickerRows.map((text, index) => (
-          <div 
-            key={index} 
-            className="ticker-row whitespace-nowrap font-display text-white text-4xl md:text-5xl font-bold uppercase tracking-wider"
-          >
-            {text}
-          </div>
-        ))}
+    <div className="fixed inset-0 z-50 flex">
+      {/* Left Panel */}
+      <div className="left-panel w-1/2 bg-brand-black flex items-center justify-center overflow-hidden relative">
+        <div className="absolute inset-0 flex flex-col justify-around">
+          {generateColumns(8)}
+        </div>
+      </div>
+      
+      {/* Right Panel */}
+      <div className="right-panel w-1/2 bg-brand-black flex items-center justify-center overflow-hidden relative">
+        <div className="absolute inset-0 flex flex-col justify-around">
+          {generateColumns(8)}
+        </div>
       </div>
     </div>
   );
