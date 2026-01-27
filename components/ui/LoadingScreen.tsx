@@ -10,66 +10,51 @@ interface LoadingScreenProps {
 
 export function LoadingScreen({ onComplete }: LoadingScreenProps) {
   useGSAP(() => {
+    // Create ticker animations for each row
+    const rows = gsap.utils.toArray('.ticker-row') as HTMLElement[];
+    
+    rows.forEach((row, index) => {
+      const direction = index % 2 === 0 ? 1 : -1; // Even rows go right, odd rows go left
+      
+      gsap.to(row, {
+        xPercent: direction * 100,
+        duration: 15,
+        repeat: -1,
+        ease: 'none'
+      });
+    });
+
+    // Curtain exit animation
     const tl = gsap.timeline({
+      delay: 3, // Show for 3 seconds
       onComplete: () => {
-        setTimeout(onComplete, 500); // Wait 500ms before calling onComplete
+        setTimeout(onComplete, 300);
       }
     });
 
-    // Animate "MYK" spinning clockwise
-    tl.fromTo('.loading-myk', 
-      { 
-        rotation: 0,
-        opacity: 0,
-        scale: 0.5
-      },
-      {
-        rotation: 360,
-        opacity: 1,
-        scale: 1,
-        duration: 2,
-        ease: 'power2.inOut'
-      },
-      0
-    );
-
-    // Animate "POLO" spinning counter-clockwise
-    tl.fromTo('.loading-polo',
-      {
-        rotation: 0,
-        opacity: 0,
-        scale: 0.5
-      },
-      {
-        rotation: -360,
-        opacity: 1,
-        scale: 1,
-        duration: 2,
-        ease: 'power2.inOut'
-      },
-      0
-    );
-
-    // Slide up to reveal hero
     tl.to('.loading-screen', {
-      y: '-100%',
-      duration: 1,
-      ease: 'power3.inOut',
-      delay: 0.5
+      yPercent: -100,
+      duration: 1.2,
+      ease: 'power3.inOut'
     });
   }, []);
 
+  // Generate 12 rows of ticker text
+  const tickerRows = Array(12).fill(null).map((_, index) => (
+    `POLO MYKPOLO MYKPOLO POLO MYKPOLO MYKPOLO POLO MYKPOLO MYKPOLO POLO MYKPOLO MYKPOLO`
+  ));
+
   return (
-    <div className="loading-screen fixed inset-0 z-50 bg-brand-black flex items-center justify-center">
-      <div className="text-center">
-        <div className="flex items-center justify-center space-x-4">
-          <span className="loading-myk text-6xl md:text-8xl font-display font-bold">
-            MYK
-          </span>
-          <span className="loading-polo text-6xl md:text-8xl font-display font-bold">
-            POLO
-          </span>
-        </div>
+    <div className="loading-screen fixed inset-0 z-50 bg-brand-black overflow-hidden">
+      <div className="h-full flex flex-col justify-center">
+        {tickerRows.map((text, index) => (
+          <div 
+            key={index} 
+            className="ticker-row whitespace-nowrap font-display text-white text-4xl md:text-5xl font-bold uppercase tracking-wider"
+          >
+            {text}
+          </div>
+        ))}
       </div>
     </div>
   );
