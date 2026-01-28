@@ -13,30 +13,36 @@ export function LoadingScreen({ onComplete }: LoadingScreenProps) {
   const leftPanelRef = useRef<HTMLDivElement>(null);
   const rightPanelRef = useRef<HTMLDivElement>(null);
   const [isVisible, setIsVisible] = useState(true);
+  const [isFontReady, setIsFontReady] = useState(false);
+
+  // Check for fonts to be ready before showing text to avoid FOUT
+  useEffect(() => {
+    document.fonts.ready.then(() => {
+      setIsFontReady(true);
+    });
+  }, []);
 
   // Timer for 2.5s delay before exit
   useEffect(() => {
+    if (!isFontReady) return;
+
     const timer = setTimeout(() => {
       setIsVisible(false);
     }, 2500);
 
     return () => clearTimeout(timer);
-  }, []);
+  }, [isFontReady]);
 
   useGSAP(() => {
     if (!isVisible) {
       // Guard against null refs
       if (!leftPanelRef.current || !rightPanelRef.current || !containerRef.current) {
-        setTimeout(onComplete, 100);
+        onComplete();
         return;
       }
 
       // Animate curtain open on exit
-      const tl = gsap.timeline({
-        onComplete: () => {
-          setTimeout(onComplete, 300);
-        }
-      });
+      const tl = gsap.timeline();
 
       tl.to([leftPanelRef.current, rightPanelRef.current], {
         xPercent: (i) => i === 0 ? -100 : 100,
@@ -45,7 +51,10 @@ export function LoadingScreen({ onComplete }: LoadingScreenProps) {
       });
 
       tl.to(containerRef.current, {
-        display: 'none'
+        display: 'none',
+        onComplete: () => {
+          onComplete();
+        }
       });
     }
   }, [isVisible]);
@@ -71,10 +80,14 @@ export function LoadingScreen({ onComplete }: LoadingScreenProps) {
     </div>
   );
 
-  if (!isVisible) return null;
+  if (!isVisible && !isFontReady) return null;
 
   return (
-    <div ref={containerRef} className="fixed inset-0 z-50 flex bg-brand-white">
+    <div
+      ref={containerRef}
+      className="fixed inset-0 z-50 flex bg-brand-white transition-opacity duration-300"
+      style={{ opacity: isFontReady ? 1 : 0 }}
+    >
       {/* Left Panel - Scrolls DOWN */}
       <div ref={leftPanelRef} className="w-1/2 h-full bg-brand-white border-r border-brand-black/10 overflow-hidden flex items-center">
         <div className="w-full flex justify-center opacity-90">
