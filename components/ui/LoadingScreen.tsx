@@ -44,8 +44,8 @@ export function LoadingScreen({ onComplete }: LoadingScreenProps) {
         ease: 'power4.inOut',
       });
 
-      tl.to(containerRef.current, { 
-        display: 'none' 
+      tl.to(containerRef.current, {
+        display: 'none'
       });
     }
   }, [isVisible]);
@@ -54,7 +54,7 @@ export function LoadingScreen({ onComplete }: LoadingScreenProps) {
   const TextBlock = () => (
     <>
       {Array(20).fill("MYK POLO").map((t, i) => (
-        <div key={i} className="whitespace-nowrap font-display font-bold text-[10vh] leading-[0.8] text-brand-black tracking-tighter uppercase select-none">
+        <div key={i} className="whitespace-nowrap font-display font-bold text-[10vh] leading-[0.8] text-black tracking-tighter uppercase select-none">
           {t}
         </div>
       ))}

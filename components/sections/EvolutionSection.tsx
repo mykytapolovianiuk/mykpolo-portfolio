@@ -1,197 +1,214 @@
 'use client';
 
-import { useGSAP } from '@gsap/react';
+import { useRef, useLayoutEffect } from 'react';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { interpolate } from 'flubber';
-import { useRef } from 'react';
 
 // Register ScrollTrigger plugin
 if (typeof window !== 'undefined') {
   gsap.registerPlugin(ScrollTrigger);
 }
 
-// STANDARD SIMPLE SVG PATHS - Flubber handles the complexity
-const SHAPE_SQUARE = "M 10 10 L 90 10 L 90 90 L 10 90 Z"; // Simple Square
-const SHAPE_TRIANGLE = "M 50 10 L 90 90 L 10 90 Z"; // Simple Triangle
-const SHAPE_CIRCLE = "M 50 10 C 72 10 90 28 90 50 C 90 72 72 90 50 90 C 28 90 10 72 10 50 C 10 28 28 10 50 10 Z"; // Perfect Bezier Circle
+// HIGH-FIDELITY PATHS (12 Points for smoother morphing)
+// SQUARE (12 pts)
+const PATH_SQUARE = "M50,10 L75,10 L90,10 L90,50 L90,90 L50,90 L10,90 L10,50 L10,10 L25,10 L50,10 Z";
+
+// TRIANGLE (12 pts - Top point splits into merged top edge of square)
+const PATH_TRIANGLE = "M50,10 L63,36 L76,63 L90,90 L70,90 L50,90 L30,90 L10,90 L23,63 L36,36 L50,10 Z";
+
+// CIRCLE (Standard Bezier - Flubber handles the poly-to-curve transition well)
+const PATH_CIRCLE = "M50,10 C72,10 90,28 90,50 C90,72 72,90 50,90 C28,90 10,72 10,50 C10,28 28,10 50,10 Z";
 
 export function EvolutionSection() {
-  const sectionRef = useRef<HTMLDivElement>(null);
-  const nameRef = useRef<HTMLDivElement>(null);
+  const containerRef = useRef<HTMLDivElement>(null);
   const wordsRef = useRef<(HTMLDivElement | null)[]>([]);
   const svgRef = useRef<SVGSVGElement>(null);
   const pathRef = useRef<SVGPathElement>(null);
   const finalTextRef = useRef<HTMLDivElement>(null);
+  const centerTextRef = useRef<HTMLDivElement>(null);
 
-  // Word data with their final positions forming a rectangle around center
-  const wordsData = [
-    { text: "Ideas", x: -200, y: -120 },
-    { text: "Code", x: 200, y: -120 },
-    { text: "Design", x: -200, y: 120 },
-    { text: "Tech", x: 200, y: 120 },
-    { text: "Process", x: -200, y: 0 },
-    { text: "Testing", x: 200, y: 0 },
-    { text: "Launch", x: 0, y: -120 },
-    { text: "Iterate", x: 0, y: 120 }
-  ];
+  // Word data for scattering/gathering effect
+  const words = ["Ideas", "Code", "Design", "Tech", "Process", "Testing", "Launch", "Iterate"];
 
-  useGSAP(() => {
-    if (!sectionRef.current || !pathRef.current) return;
+  useLayoutEffect(() => {
+    const ctx = gsap.context(() => {
+      if (!containerRef.current || !pathRef.current) return;
 
-    // Set initial random positions for words (chaos state)
-    wordsRef.current.forEach((wordEl, i) => {
-      if (wordEl) {
-        gsap.set(wordEl, {
-          x: (Math.random() - 0.5) * 600,
-          y: (Math.random() - 0.5) * 400,
-          opacity: 0.7,
-          scale: 0.9
-        });
-      }
-    });
-
-    // Hide SVG and final text initially
-    gsap.set([svgRef.current, finalTextRef.current], {
-      autoAlpha: 0
-    });
-
-    // Create master timeline with ScrollTrigger
-    const masterTimeline = gsap.timeline({
-      scrollTrigger: {
-        trigger: sectionRef.current,
-        start: "top top",
-        end: "+=500%",
-        pin: true,
-        scrub: 1,
-        anticipatePin: 1
-      }
-    });
-
-    // PHASE 1: ASSEMBLE - Words animate to rectangle formation
-    wordsRef.current.forEach((wordEl, i) => {
-      if (wordEl) {
-        masterTimeline.to(wordEl, {
-          x: wordsData[i].x,
-          y: wordsData[i].y,
-          opacity: 1,
-          scale: 1,
-          duration: 1,
-          ease: "power2.out"
-        }, 0);
-      }
-    });
-
-    // PHASE 2: THE SWAP - Hide words -> Show SVG Path (Square)
-    masterTimeline.to([nameRef.current, ...wordsRef.current.filter(Boolean)], {
-      autoAlpha: 0,
-      duration: 0.3
-    }, 1.2);
-
-    masterTimeline.to(svgRef.current, {
-      autoAlpha: 1,
-      duration: 0.3
-    }, 1.3);
-
-    // Set initial square path
-    gsap.set(pathRef.current, {
-      attr: { d: SHAPE_SQUARE }
-    });
-
-    // PHASE 3: LIQUID MORPH (Square -> Triangle)
-    const squareToTriangle = interpolate(SHAPE_SQUARE, SHAPE_TRIANGLE);
-    const proxy1 = { t: 0 };
-
-    masterTimeline.to(proxy1, {
-      t: 1,
-      duration: 1.5,
-      ease: "power2.inOut",
-      onUpdate: () => {
-        if (pathRef.current) {
-          pathRef.current.setAttribute('d', squareToTriangle(proxy1.t));
+      // Set initial scattered positions for words
+      wordsRef.current.forEach((wordEl) => {
+        if (wordEl) {
+          gsap.set(wordEl, {
+            x: (Math.random() - 0.5) * 800,
+            y: (Math.random() - 0.5) * 600,
+            opacity: 0.8,
+            scale: 0.9
+          });
         }
-      }
-    }, 1.8);
+      });
 
-    // PHASE 4: LIQUID MORPH (Triangle -> Circle)
-    const triangleToCircle = interpolate(SHAPE_TRIANGLE, SHAPE_CIRCLE);
-    const proxy2 = { t: 0 };
+      // Hide SVG initially
+      gsap.set(svgRef.current, { autoAlpha: 0 });
 
-    masterTimeline.to(proxy2, {
-      t: 1,
-      duration: 1.5,
-      ease: "power2.inOut",
-      onUpdate: () => {
-        if (pathRef.current) {
-          pathRef.current.setAttribute('d', triangleToCircle(proxy2.t));
+      // Create scroll-triggered timeline
+      // Using a virtual duration of 100 for easy percentage mapping
+      const tl = gsap.timeline({
+        scrollTrigger: {
+          trigger: containerRef.current,
+          pin: true,
+          scrub: 1,
+          end: "+=700%"
         }
-      }
-    }, 3.5);
+      });
 
-    // PHASE 5: FINAL TEXT REVEAL
-    masterTimeline.to(finalTextRef.current, {
-      autoAlpha: 1,
-      y: 0,
-      duration: 0.8,
-      ease: "power2.out"
-    }, 4.2);
+      // --- PHASE 1: CHAOS -> STRUCTURE (0-35%) ---
+      // Words move to form the PERFECT SQUARE PERIMETER
+      // Square size: 300x300 => dist from center is 150
+      const squareCoords = [
+        { x: -150, y: -150 }, // Top Left
+        { x: 0, y: -150 }, // Top Center
+        { x: 150, y: -150 }, // Top Right
+        { x: 150, y: 0 },    // Right Middle
+        { x: 150, y: 150 },  // Bottom Right
+        { x: 0, y: 150 },  // Bottom Center
+        { x: -150, y: 150 },  // Bottom Left
+        { x: -150, y: 0 },    // Left Middle
+      ];
 
-    // PULSE ANIMATION (Independent) - Start after circle formation
-    masterTimeline.to(svgRef.current, {
-      scale: 1.05,
-      repeat: -1,
-      yoyo: true,
-      duration: 0.6,
-      ease: "power1.inOut"
-    }, 5);
+      wordsRef.current.forEach((wordEl, i) => {
+        if (wordEl) {
+          const target = squareCoords[i % squareCoords.length];
+          tl.to(wordEl, {
+            x: target.x,
+            y: target.y,
+            opacity: 1,
+            scale: 1,
+            duration: 35, // 0 -> 35 (Slower gather)
+            ease: "power2.inOut"
+          }, 0);
+        }
+      });
 
+      // --- PHASE 2: THE WELD (35-40%) ---
+      // Words dissolve into the solid square
+      tl.to([wordsRef.current.filter(Boolean), centerTextRef.current], {
+        autoAlpha: 0,
+        duration: 5
+      }, 35);
+
+      tl.to(svgRef.current, {
+        autoAlpha: 1,
+        duration: 5
+      }, 35);
+
+      // Set initial square path
+      gsap.set(pathRef.current, {
+        attr: { d: PATH_SQUARE }
+      });
+
+      // --- PHASE 3: HOLD SQUARE (40-50%) ---
+      // Pause (10 units)
+
+      // --- PHASE 4: LIQUID MORPH 1 (SQUARE -> TRIANGLE) (50-65%) ---
+      // Slower, viscous morph (15 units)
+      const squareToTriangle = interpolate(PATH_SQUARE, PATH_TRIANGLE);
+      const proxy1 = { progress: 0 };
+
+      tl.to(proxy1, {
+        progress: 1,
+        duration: 15,
+        ease: "power1.inOut",
+        onUpdate: () => {
+          if (pathRef.current) {
+            pathRef.current.setAttribute('d', squareToTriangle(proxy1.progress));
+          }
+        }
+      }, 50);
+
+      // --- PHASE 5: HOLD TRIANGLE (65-70%) ---
+      // Pause (5 units)
+
+      // --- PHASE 6: LIQUID MORPH 2 (TRIANGLE -> CIRCLE) (70-85%) ---
+      // Slower, viscous morph (15 units)
+      const triangleToCircle = interpolate(PATH_TRIANGLE, PATH_CIRCLE);
+      const proxy2 = { progress: 0 };
+
+      tl.to(proxy2, {
+        progress: 1,
+        duration: 15,
+        ease: "power1.inOut",
+        onUpdate: () => {
+          if (pathRef.current) {
+            pathRef.current.setAttribute('d', triangleToCircle(proxy2.progress));
+          }
+        }
+      }, 70);
+
+      // --- PHASE 7: FINAL STATE (85-100%) ---
+      // Final Text Reveal
+      tl.to(finalTextRef.current, {
+        autoAlpha: 1,
+        duration: 15,
+        ease: "none"
+      }, 85);
+
+      // Heartbeat/pulse effect (independent loops)
+      gsap.to(svgRef.current, {
+        scale: 1.05,
+        repeat: -1,
+        yoyo: true,
+        duration: 0.8,
+        ease: "power1.inOut"
+      });
+
+    }, containerRef);
+
+    return () => ctx.revert();
   }, []);
 
   return (
-    <section 
-      ref={sectionRef}
-      className="h-screen w-full bg-brand-white relative overflow-hidden"
+    <div
+      ref={containerRef}
+      className="h-screen w-full bg-brand-white flex items-center justify-center relative overflow-hidden"
     >
-      {/* Center Name */}
-      <div 
-        ref={nameRef}
-        className="absolute font-display font-bold text-5xl text-brand-black z-10"
-        style={{ top: '50%', left: '50%', transform: 'translate(-50%, -50%)' }}
+      {/* Center fixed text */}
+      <div
+        ref={centerTextRef}
+        className="evolution-center-text font-display font-bold text-5xl text-brand-black absolute z-10"
       >
         Mykyta Polovianiuk
       </div>
 
-      {/* Floating Words */}
-      {wordsData.map((word, index) => (
+      {/* Scattered words */}
+      {words.map((word, index) => (
         <div
-          key={word.text}
+          key={word}
           ref={(el) => { wordsRef.current[index] = el; }}
-          className="absolute font-display font-bold text-xl text-brand-black whitespace-nowrap z-10"
+          className="absolute font-display font-bold text-xl text-brand-black whitespace-nowrap"
         >
-          {word.text}
+          {word}
         </div>
       ))}
 
-      {/* The SVG - Liquid morphing powered by flubber */}
-      <svg 
+      {/* Morphing SVG */}
+      <svg
         ref={svgRef}
-        className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[300px] h-[300px] md:w-[400px] md:h-[400px] z-20"
+        className="w-[300px] h-[300px] absolute z-20"
         viewBox="0 0 100 100"
       >
-        <path 
+        <path
           ref={pathRef}
           fill="black"
         />
       </svg>
 
-      {/* Final Text */}
+      {/* Final text */}
       <div
         ref={finalTextRef}
-        className="absolute font-display font-bold text-2xl text-brand-black z-30"
-        style={{ top: '75%', left: '50%', transform: 'translate(-50%, 20px)' }}
+        className="font-display font-bold text-2xl text-brand-black absolute bottom-20 z-30 opacity-0"
       >
         everything starts as a shape.
       </div>
-    </section>
+    </div>
   );
 }
