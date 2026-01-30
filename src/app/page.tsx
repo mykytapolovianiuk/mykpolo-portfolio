@@ -1,21 +1,25 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useGSAP } from '@gsap/react';
 import gsap from 'gsap';
+import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { LoadingScreen } from '@/components/ui/LoadingScreen';
 import { Header } from '@/components/layout/Header';
 import { Hero } from '@/components/sections/Hero';
 import { EvolutionSection } from '@/components/sections/EvolutionSection';
+import { ProjectSection } from '@/components/sections/ProjectSection';
+import { PeaceSection } from '@/components/sections/PeaceSection';
+
+// Register specific plugin here if needed, or rely on global registration in components
+if (typeof window !== 'undefined') {
+  gsap.registerPlugin(ScrollTrigger);
+}
 
 export default function Home() {
   const [isLoading, setIsLoading] = useState(true);
-
-  useGSAP(() => {
-    if (typeof window !== 'undefined') {
-      window.history.scrollRestoration = 'manual';
-    }
-  }, [isLoading]);
+  const [headerVisible, setHeaderVisible] = useState(true);
+  const mainRef = useRef<HTMLElement>(null);
 
   const [fontsLoaded, setFontsLoaded] = useState(false);
   const [isHeroAnimating, setIsHeroAnimating] = useState(false);
@@ -50,16 +54,21 @@ export default function Home() {
       )}
 
       {/* Main Content Layer */}
-      <div className="relative z-0">
-        <Header />
+      <main ref={mainRef} className="relative z-0 bg-brand-white min-h-screen">
+        <Header visible={headerVisible} />
 
-        {/* Hero Section - Always rendered underneath */}
+        {/* Hero Section */}
         <Hero startAnimation={isHeroAnimating} />
 
+        {/* Evolution Section - Header logic handled inside */}
+        <EvolutionSection onToggleHeader={setHeaderVisible} />
 
-        {/* Evolution Section - Chaos to Structure to Product */}
-        <EvolutionSection />
-      </div>
+        {/* Project Section */}
+        <ProjectSection />
+
+        {/* Peace Section - Header logic handled inside */}
+        <PeaceSection onToggleHeader={setHeaderVisible} />
+      </main>
     </>
   );
 }

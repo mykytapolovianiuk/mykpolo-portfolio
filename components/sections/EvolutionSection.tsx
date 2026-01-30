@@ -73,12 +73,16 @@ const PATH_SQUARE = createPolygon('square');
 const PATH_TRIANGLE = createPolygon('triangle');
 const PATH_CIRCLE = createPolygon('circle');
 
-export function EvolutionSection() {
+interface EvolutionSectionProps {
+  onToggleHeader?: (visible: boolean) => void;
+}
+
+export function EvolutionSection({ onToggleHeader }: EvolutionSectionProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const wordsRef = useRef<(HTMLDivElement | null)[]>([]);
   const svgRef = useRef<SVGSVGElement>(null);
   const pathRef = useRef<SVGPathElement>(null);
-  const finalTextRef = useRef<HTMLDivElement>(null);
+  const finalTextRef = useRef<HTMLDivElement>(null); // Replaced by Transition effect
   const centerTextRef = useRef<HTMLDivElement>(null);
 
   const words = ["Ideas", "Code", "Design", "Tech", "Process", "Testing", "Launch", "Iterate"];
@@ -88,7 +92,6 @@ export function EvolutionSection() {
       if (!containerRef.current || !pathRef.current) return;
 
       // --- INITIAL STATES ---
-      // Words scattered
       wordsRef.current.forEach((wordEl) => {
         if (wordEl) {
           gsap.set(wordEl, {
@@ -96,166 +99,114 @@ export function EvolutionSection() {
             y: (Math.random() - 0.5) * 400,
             opacity: 1,
             scale: 1,
-            filter: 'blur(0px)', // NO BLUR
+            filter: 'blur(0px)',
             letterSpacing: '0px'
           });
         }
       });
 
       gsap.set(centerTextRef.current, { scale: 1, opacity: 1, letterSpacing: '0px' });
-
-      // SVG Shape (The "Symbiote Core")
-      // Hidden scale 0.05 (dot)
-      gsap.set(svgRef.current, {
-        autoAlpha: 1,
-        scale: 0.05,
-        opacity: 0 // Hidden until swap
-      });
-
+      gsap.set(svgRef.current, { autoAlpha: 1, scale: 0.05, opacity: 0 }); // Hidden
       gsap.set(pathRef.current, { attr: { d: PATH_SQUARE } });
-      gsap.set(finalTextRef.current, { autoAlpha: 0 });
 
       // --- MASTER TIMELINE ---
       const tl = gsap.timeline({
         scrollTrigger: {
           trigger: containerRef.current,
           pin: true,
-          scrub: 0.5, // 0.5 scrub for heavy feel
-          end: "+=1000%"
+          scrub: 0.5,
+          end: "+=1000%",
+          onEnter: () => onToggleHeader?.(false),
+          onLeaveBack: () => onToggleHeader?.(true)
         }
       });
 
-      // --- PHASE 1: EVENT HORIZON (0-20%) ---
-      // Words rotate/swirl
-      wordsRef.current.forEach((wordEl, i) => {
-        const angle = (i / words.length) * Math.PI * 2;
-        tl.to(wordEl, {
-          x: `+=${Math.cos(angle) * 30}`,
-          y: `+=${Math.sin(angle) * 30}`,
-          scale: 0.8,
-          rotation: Math.random() * 20 - 10,
-          duration: 20,
-          ease: "sine.inOut"
-        }, 0);
-      });
+      // --- PHASE 1: KINETIC COLLAPSE (0-25%) ---
+      // Words & Text compress significantly
 
-      // --- PHASE 2: SINGULARITY (20-30%) ---
-      // Implosion to (0,0), Scale -> 0.05, LetterSpacing -> -20px
-      // Creates dense black mass. NO FADING.
-
-      wordsRef.current.forEach((wordEl) => {
-        tl.to(wordEl, {
-          x: 0,
-          y: 0,
-          scale: 0.05,
-          letterSpacing: '-20px',
-          rotation: Math.random() * 360, // Chaos
-          opacity: 1,
-          duration: 10, // 20->30
-          ease: "expo.in"
-        }, 20);
-      });
-
-      tl.to(centerTextRef.current, {
+      const compressParams = {
+        x: 0,
+        y: 0,
         scale: 0.05,
-        letterSpacing: '-20px',
-        rotation: 180,
-        duration: 10,
+        letterSpacing: '-50px', // EXTREME JAGGED COLLAPSE
+        opacity: 1,
+        duration: 25, // 0->25
         ease: "expo.in"
-      }, 20);
+      };
 
-      // --- PHASE 3: THE BIG BANG (30-32%) ---
-      // Swap: Words vanish, Shape appears & Scales 0.05 -> 1
+      wordsRef.current.forEach((wordEl) => tl.to(wordEl, compressParams, 0));
+      tl.to(centerTextRef.current, compressParams, 0);
 
-      // 1. Swap visibility Instantly
-      tl.to([wordsRef.current, centerTextRef.current], {
-        autoAlpha: 0,
-        duration: 0.1
-      }, 30);
+      // --- PHASE 2: EXPLOSION (25-27%) ---
+      // Swap Instantly
+      tl.to([wordsRef.current, centerTextRef.current], { autoAlpha: 0, duration: 0.1 }, 25);
+      tl.to(svgRef.current, { autoAlpha: 1, duration: 0.1 }, 25);
 
-      tl.to(svgRef.current, {
-        autoAlpha: 1,
-        duration: 0.1
-      }, 30);
-
-      // 2. Explosion
+      // Boom
       tl.to(svgRef.current, {
         scale: 1,
-        duration: 2, // 30->32 (Very fast)
-        ease: "power4.out" // Aggressive bang
-      }, 30.1);
+        duration: 2, // 25->27
+        ease: "elastic.out(1, 0.4)"
+      }, 25.1);
 
+      // --- PHASE 3: MORPHING (27-75%) ---
 
-      // --- PHASE 4: MORPHING (Hold & Transform) ---
+      // Hold Square: 27-40
 
-      // 32-45%: HOLD SQUARE
-
-      // 45-55%: MORPH SQUARE -> TRIANGLE
+      // Morph Square -> Triangle: 40-50
       const squareToTriangle = interpolate(PATH_SQUARE, PATH_TRIANGLE);
       const proxy1 = { progress: 0 };
-
       tl.to(proxy1, {
-        progress: 1,
-        duration: 10, // 45 -> 55
-        ease: "linear",
-        onUpdate: () => {
-          if (pathRef.current) {
-            pathRef.current.setAttribute('d', squareToTriangle(proxy1.progress));
-          }
-        }
-      }, 45);
+        progress: 1, duration: 10, ease: "linear",
+        onUpdate: () => pathRef.current && pathRef.current.setAttribute('d', squareToTriangle(proxy1.progress))
+      }, 40);
 
-      // 55-70%: HOLD TRIANGLE
+      // Hold Triangle: 50-60
 
-      // 70-80%: MORPH TRIANGLE -> CIRCLE
+      // Morph Triangle -> Circle: 60-70
       const triangleToCircle = interpolate(PATH_TRIANGLE, PATH_CIRCLE);
       const proxy2 = { progress: 0 };
-
       tl.to(proxy2, {
-        progress: 1,
-        duration: 10, // 70 -> 80
-        ease: "linear",
-        onUpdate: () => {
-          if (pathRef.current) {
-            pathRef.current.setAttribute('d', triangleToCircle(proxy2.progress));
-          }
-        }
-      }, 70);
+        progress: 1, duration: 10, ease: "linear",
+        onUpdate: () => pathRef.current && pathRef.current.setAttribute('d', triangleToCircle(proxy2.progress))
+      }, 60);
 
-      // 80-100%: FINAL TEXT & PULSE
-      tl.to(finalTextRef.current, {
-        autoAlpha: 1,
-        duration: 20,
-        ease: "none"
-      }, 80);
+      // Hold Circle: 70-75 (Prepare for flight)
+
+
+      // --- PHASE 4: FLY DOWN (TRANSITION) (75-100%) ---
+      // Circle zooms out and moves to top-right of the Next Section.
+      // Assuming Next Section starts immediately after.
+      // We are Pinned. Moving relative to the viewport center.
+      // Move Down: +100vh (approximately pushing it offscreen/into next section space? No, pinned element stays in view).
+      // Wait, if it's pinned, "moving down" physically moves it down the screen.
+      // To "land" in the next section, we want it to end up in a position that MATCHES the next section's layout.
+
+      tl.to(svgRef.current, {
+        x: "30vw",   // Move Right
+        y: "35vh",   // Move Down (towards bottom right corner)
+        scale: 0.6,
+        duration: 25, // 75 -> 100
+        ease: "power2.inOut"
+      }, 75);
 
     });
 
-    // Separate Pulse (Active only at end)
+    // Pulse Trigger (Project Section)
     const pulseTween = gsap.to(svgRef.current, {
-      scale: 1.05,
+      scale: 0.65,
       repeat: -1,
       yoyo: true,
       duration: 0.8,
-      ease: "power1.inOut",
+      ease: "sine.inOut",
       paused: true
     });
 
     ScrollTrigger.create({
-      trigger: containerRef.current,
-      start: "top top",
-      end: "+=1000%",
-      onUpdate: (self) => {
-        if (self.progress > 0.85) {
-          pulseTween.play();
-        } else {
-          pulseTween.pause();
-          // Reset scale if not in "Bang" phase
-          if (self.progress > 0.35) {
-            gsap.to(svgRef.current, { scale: 1, duration: 0.2, overwrite: 'auto' });
-          }
-        }
-      }
+      trigger: "#project-section",
+      start: "top center",
+      onEnter: () => pulseTween.play(),
+      onLeaveBack: () => pulseTween.pause()
     });
 
     return () => ctx.revert();
@@ -296,14 +247,6 @@ export function EvolutionSection() {
           fill="black"
         />
       </svg>
-
-      {/* Final text */}
-      <div
-        ref={finalTextRef}
-        className="font-display font-bold text-2xl text-brand-black absolute bottom-20 z-30 opacity-0"
-      >
-        everything starts as a shape.
-      </div>
     </div>
   );
 }

@@ -2,13 +2,20 @@
 
 import { useState } from 'react';
 
-export function Header() {
+interface HeaderProps {
+  visible?: boolean;
+}
+
+export function Header({ visible = true }: HeaderProps) {
   const [isPanelOpen, setIsPanelOpen] = useState(false);
 
   return (
     <>
-      {/* Top Bar - Fixed header with mix-blend-difference */}
-      <div className="fixed top-0 left-0 w-full h-0 z-50 pointer-events-none mix-blend-difference text-brand-white">
+      {/* Header Container - Fades based on visible prop */}
+      <header
+        className={`fixed top-0 left-0 w-full z-50 mix-blend-difference text-white transition-opacity duration-500 ease-in-out ${visible ? 'opacity-100' : 'opacity-0 pointer-events-none'
+          }`}
+      >
         {/* Logo */}
         <div className="absolute top-[30px] left-[52px] pointer-events-auto">
           <div className="font-display font-bold text-[24px]">MYKPOLO</div>
@@ -21,9 +28,15 @@ export function Header() {
         >
           #about
         </button>
-      </div>
+      </header>
 
       {/* Sidebar - Fixed right, 600px width, black background with CSS transition */}
+      {/* Sidebar should probably remain independent of header visibility? 
+          Or should it also hide? 
+          Usually sidebar stays functional if open, but the trigger button hides.
+          Lets keep logic simple: Sidebar is z-[60], higher than header. 
+          It manages its own state. 
+      */}
       <div className={`fixed top-0 right-0 h-full w-full md:w-[600px] bg-black z-[60] shadow-2xl transition-transform duration-500 ease-in-out ${isPanelOpen ? 'translate-x-0' : 'translate-x-full'
         }`}>
         <div className="relative w-full h-full text-white">
