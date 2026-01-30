@@ -40,29 +40,30 @@ export function Header({ visible = true, isDark = false, isOpen = false, onToggl
           {/* Close Button (Mobile: 327, 27 | Desktop: Right 54) */}
           <button
             onClick={() => onToggle?.(false)}
-            className="absolute top-[27px] right-[24px] md:top-[39px] md:right-[54px] font-display font-bold text-[16px] hover:opacity-70 cursor-pointer z-20"
+            className="absolute top-[27px] right-[24px] md:top-[39px] md:right-[54px] font-display font-bold text-[16px] hover:opacity-70 cursor-pointer z-50"
           >
             x
           </button>
 
           {/* Mobile "about" label */}
-          <div className="absolute top-[27px] left-[30px] font-display font-bold text-[16px] md:hidden">
+          <div className="absolute top-[27px] left-[30px] font-display font-bold text-[16px] md:hidden z-50">
             about
           </div>
 
-          {/* Content Container */}
-          <div className="absolute inset-0 overflow-y-auto no-scrollbar">
-            <div className="relative min-h-[900px]">
+          {/* Content Container (Scrollable) */}
+          <div className="absolute inset-0 overflow-y-auto no-scrollbar pb-20 pt-[60px] md:pt-0">
+            {/* Note: I added top padding for mobile so content doesn't overlap header close/about buttons */}
+            <div className="relative min-h-[900px] flex flex-col gap-8 md:block">
 
-              {/* 1. Bio (Mobile: Top 72, Left 38 | Desktop: Top 105, Left 43) */}
-              <div className="absolute top-[72px] left-[38px] w-[317px] md:top-[105px] md:left-[43px] md:w-[496px]">
+              {/* 1. Bio */}
+              <div className="relative md:absolute top-0 left-[30px] w-[317px] md:top-[105px] md:left-[43px] md:w-[496px] mt-10 md:mt-0">
                 <p className="font-display font-bold text-[12px] md:text-[16px] leading-relaxed uppercase">
                   Full-stack developer based in Kyiv, creating digital experiences with attention to detail and modern technologies.
                 </p>
               </div>
 
-              {/* 2. Technology (Mobile: Top 176 | Desktop: Top 245) */}
-              <div className="absolute top-[176px] left-[30px] md:top-[245px] md:left-[43px]">
+              {/* 2. Technology */}
+              <div className="relative md:absolute left-[30px] md:top-[245px] md:left-[43px]">
                 <h3 className="font-display font-bold text-[14px] md:text-[16px] uppercase mb-4 md:mb-6">TECHNOLOGY</h3>
                 <div className="flex flex-col gap-8 md:gap-8 font-display font-bold text-[12px] md:text-[14px] uppercase pl-[8px] md:pl-0">
                   <div className="flex flex-col gap-1">
@@ -80,8 +81,8 @@ export function Header({ visible = true, isDark = false, isOpen = false, onToggl
                 </div>
               </div>
 
-              {/* 3. Experience (Mobile: Top 416 | Desktop: Top 539) */}
-              <div className="absolute top-[416px] left-[30px] md:top-[539px] md:left-[43px]">
+              {/* 3. Experience */}
+              <div className="relative md:absolute left-[30px] md:top-[539px] md:left-[43px]">
                 <h3 className="font-display font-bold text-[14px] md:text-[16px] uppercase mb-4 md:mb-6">EXPERIENCE</h3>
                 <div className="flex flex-col gap-6 font-display font-bold text-[10px] md:text-[14px] uppercase pl-[8px] md:pl-0">
                   <div className="flex flex-row md:gap-4 relative">
@@ -98,8 +99,8 @@ export function Header({ visible = true, isDark = false, isOpen = false, onToggl
                 </div>
               </div>
 
-              {/* 4. Footer Links (Mobile: Top 607 | Desktop: Top 850) */}
-              <div className="absolute top-[607px] left-[30px] pb-10 md:top-[850px] md:left-[43px]">
+              {/* 4. Footer Links */}
+              <div className="relative md:absolute left-[30px] pb-10 md:top-[850px] md:left-[43px]">
                 <h3 className="font-display font-bold text-[14px] uppercase mb-4 md:hidden">contact</h3>
                 <div className="pl-[1px] md:pl-0">
                   <div className="font-sans text-[12px] lowercase underline mb-8 md:hidden">
