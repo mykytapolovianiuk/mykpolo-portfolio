@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { SmoothScroll } from '@/components/utils/SmoothScroll';
 import "./globals.css";
+import { Cursor } from "../../components/ui/Cursor";
 
 export const metadata: Metadata = {
   title: "mykpolo",
@@ -20,7 +21,8 @@ export default function RootLayout({
           rel="stylesheet"
         />
       </head>
-      <body className="bg-brand-black text-brand-white font-sans">
+      <body className="bg-brand-black text-brand-white font-sans select-none cursor-none">
+        <Cursor />
         <SmoothScroll>
           {children}
         </SmoothScroll>

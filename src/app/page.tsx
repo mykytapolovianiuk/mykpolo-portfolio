@@ -19,6 +19,7 @@ if (typeof window !== 'undefined') {
 export default function Home() {
   const [isLoading, setIsLoading] = useState(true);
   const [headerVisible, setHeaderVisible] = useState(true);
+  const [isDark, setIsDark] = useState(false); // Theme state
   const mainRef = useRef<HTMLElement>(null);
 
   const [fontsLoaded, setFontsLoaded] = useState(false);
@@ -55,7 +56,7 @@ export default function Home() {
 
       {/* Main Content Layer */}
       <main ref={mainRef} className="relative z-0 bg-brand-white min-h-screen">
-        <Header visible={headerVisible} />
+        <Header visible={headerVisible} isDark={isDark} />
 
         {/* Hero Section */}
         <Hero startAnimation={isHeroAnimating} />
@@ -67,7 +68,10 @@ export default function Home() {
         <ProjectSection />
 
         {/* Peace Section - Header logic handled inside */}
-        <PeaceSection onToggleHeader={setHeaderVisible} />
+        <PeaceSection
+          onToggleHeader={setHeaderVisible}
+          onToggleTheme={setIsDark}
+        />
       </main>
     </>
   );

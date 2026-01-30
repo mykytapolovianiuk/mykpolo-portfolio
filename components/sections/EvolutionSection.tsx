@@ -19,34 +19,28 @@ const createPolygon = (type: 'square' | 'triangle' | 'circle', points = 120) => 
     let x = 0, y = 0;
 
     if (type === 'square') {
-      // 0.0 - 0.125: Top Center -> Top Right
       if (t < 0.125) {
         const p = t / 0.125;
         x = 50 + p * 40; y = 10;
       }
-      // 0.125 - 0.375: Right
       else if (t < 0.375) {
         const p = (t - 0.125) / 0.25;
         x = 90; y = 10 + p * 80;
       }
-      // 0.375 - 0.625: Bottom
       else if (t < 0.625) {
         const p = (t - 0.375) / 0.25;
         x = 90 - p * 80; y = 90;
       }
-      // 0.625 - 0.875: Left
       else if (t < 0.875) {
         const p = (t - 0.625) / 0.25;
         x = 10; y = 90 - p * 80;
       }
-      // 0.875 - 1.0: Top Left -> Top Center
       else {
         const p = (t - 0.875) / 0.125;
         x = 10 + p * 40; y = 10;
       }
     }
     else if (type === 'triangle') {
-      // Top(50,10) -> BR(90,90) -> BL(10,90) -> Top
       if (t < 0.333) {
         const p = t / 0.333;
         x = 50 + p * 40; y = 10 + p * 80;
@@ -59,7 +53,6 @@ const createPolygon = (type: 'square' | 'triangle' | 'circle', points = 120) => 
       }
     }
     else if (type === 'circle') {
-      // Start -90deg (Top)
       const angle = (t * Math.PI * 2) - (Math.PI / 2);
       x = cx + 40 * Math.cos(angle);
       y = cy + 40 * Math.sin(angle);
@@ -82,8 +75,8 @@ export function EvolutionSection({ onToggleHeader }: EvolutionSectionProps) {
   const wordsRef = useRef<(HTMLDivElement | null)[]>([]);
   const svgRef = useRef<SVGSVGElement>(null);
   const pathRef = useRef<SVGPathElement>(null);
-  const finalTextRef = useRef<HTMLDivElement>(null); // Replaced by Transition effect
   const centerTextRef = useRef<HTMLDivElement>(null);
+  const introRef = useRef<HTMLDivElement>(null); // Kept for Arrow
 
   const words = ["Ideas", "Code", "Design", "Tech", "Process", "Testing", "Launch", "Iterate"];
 
@@ -92,11 +85,43 @@ export function EvolutionSection({ onToggleHeader }: EvolutionSectionProps) {
       if (!containerRef.current || !pathRef.current) return;
 
       // --- INITIAL STATES ---
+      // Generate chaotic but non-overlapping positions
+      const placedPositions: { x: number, y: number }[] = [];
+      const minRadius = 220;
+      const maxRadius = 500;
+      const minDistance = 120; // Minimum space between words
+
       wordsRef.current.forEach((wordEl) => {
         if (wordEl) {
+          let x = 0, y = 0;
+          let valid = false;
+          let attempts = 0;
+
+          // Try to find a spot that doesn't overlap
+          while (!valid && attempts < 50) {
+            const angle = Math.random() * Math.PI * 2;
+            const radius = minRadius + Math.random() * (maxRadius - minRadius);
+            x = Math.cos(angle) * radius;
+            y = Math.sin(angle) * radius;
+
+            valid = true;
+            // Check collision with existing
+            for (const pos of placedPositions) {
+              const dist = Math.hypot(x - pos.x, y - pos.y);
+              if (dist < minDistance) {
+                valid = false;
+                break;
+              }
+            }
+            attempts++;
+          }
+
+          if (valid) placedPositions.push({ x, y });
+          // If not valid after 50 tries, just use the last calculated x,y
+
           gsap.set(wordEl, {
-            x: (Math.random() - 0.5) * 600,
-            y: (Math.random() - 0.5) * 400,
+            x: x,
+            y: y,
             opacity: 1,
             scale: 1,
             filter: 'blur(0px)',
@@ -106,7 +131,7 @@ export function EvolutionSection({ onToggleHeader }: EvolutionSectionProps) {
       });
 
       gsap.set(centerTextRef.current, { scale: 1, opacity: 1, letterSpacing: '0px' });
-      gsap.set(svgRef.current, { autoAlpha: 1, scale: 0.05, opacity: 0 }); // Hidden
+      gsap.set(svgRef.current, { autoAlpha: 1, scale: 0.01, opacity: 0 }); // Start tiny/hidden
       gsap.set(pathRef.current, { attr: { d: PATH_SQUARE } });
 
       // --- MASTER TIMELINE ---
@@ -121,92 +146,61 @@ export function EvolutionSection({ onToggleHeader }: EvolutionSectionProps) {
         }
       });
 
-      // --- PHASE 1: KINETIC COLLAPSE (0-25%) ---
-      // Words & Text compress significantly
+      // --- PHASE 1: KINETIC COLLAPSE (0-20%) ---
 
       const compressParams = {
         x: 0,
         y: 0,
         scale: 0.05,
-        letterSpacing: '-50px', // EXTREME JAGGED COLLAPSE
+        letterSpacing: '-50px', // Collapse text into a line
         opacity: 1,
-        duration: 25, // 0->25
+        duration: 20,
         ease: "expo.in"
       };
 
       wordsRef.current.forEach((wordEl) => tl.to(wordEl, compressParams, 0));
       tl.to(centerTextRef.current, compressParams, 0);
 
-      // --- PHASE 2: EXPLOSION (25-27%) ---
-      // Swap Instantly
-      tl.to([wordsRef.current, centerTextRef.current], { autoAlpha: 0, duration: 0.1 }, 25);
-      tl.to(svgRef.current, { autoAlpha: 1, duration: 0.1 }, 25);
+      // --- PHASE 2: EXPLOSION (20-25%) ---
+      // Words disappear, Square appears and scales UP to 1.
+      tl.to([wordsRef.current, centerTextRef.current, introRef.current], { autoAlpha: 0, duration: 0.1 }, 20);
+      tl.to(svgRef.current, { autoAlpha: 1, duration: 0.1 }, 20);
 
-      // Boom
       tl.to(svgRef.current, {
         scale: 1,
-        duration: 2, // 25->27
+        duration: 5, // 20->25
         ease: "elastic.out(1, 0.4)"
-      }, 25.1);
+      }, 20.1);
 
-      // --- PHASE 3: MORPHING (27-75%) ---
+      // --- PHASE 3: MORPHING (25-75%) ---
+      // Strictly Morphing. scale is LOCKED at 1.
 
-      // Hold Square: 27-40
+      // Square -> Triangle (25-45)
+      tl.to(pathRef.current, {
+        attr: { d: PATH_TRIANGLE },
+        duration: 20,
+        ease: "power1.inOut"
+      }, 25);
 
-      // Morph Square -> Triangle: 40-50
-      const squareToTriangle = interpolate(PATH_SQUARE, PATH_TRIANGLE);
-      const proxy1 = { progress: 0 };
-      tl.to(proxy1, {
-        progress: 1, duration: 10, ease: "linear",
-        onUpdate: () => pathRef.current && pathRef.current.setAttribute('d', squareToTriangle(proxy1.progress))
-      }, 40);
+      // (Phrase Removed Here)
 
-      // Hold Triangle: 50-60
-
-      // Morph Triangle -> Circle: 60-70
-      const triangleToCircle = interpolate(PATH_TRIANGLE, PATH_CIRCLE);
-      const proxy2 = { progress: 0 };
-      tl.to(proxy2, {
-        progress: 1, duration: 10, ease: "linear",
-        onUpdate: () => pathRef.current && pathRef.current.setAttribute('d', triangleToCircle(proxy2.progress))
-      }, 60);
-
-      // Hold Circle: 70-75 (Prepare for flight)
+      // Triangle -> Circle (50-70)
+      tl.to(pathRef.current, {
+        attr: { d: PATH_CIRCLE },
+        duration: 20,
+        ease: "power1.inOut"
+      }, 50);
 
 
-      // --- PHASE 4: FLY DOWN (TRANSITION) (75-100%) ---
-      // Circle zooms out and moves to top-right of the Next Section.
-      // Assuming Next Section starts immediately after.
-      // We are Pinned. Moving relative to the viewport center.
-      // Move Down: +100vh (approximately pushing it offscreen/into next section space? No, pinned element stays in view).
-      // Wait, if it's pinned, "moving down" physically moves it down the screen.
-      // To "land" in the next section, we want it to end up in a position that MATCHES the next section's layout.
-
+      // --- PHASE 4: TRANSITION (75-85%) ---
+      // Fade out quicker to reveal Projects
       tl.to(svgRef.current, {
-        x: "30vw",   // Move Right
-        y: "35vh",   // Move Down (towards bottom right corner)
-        scale: 0.6,
-        duration: 25, // 75 -> 100
+        autoAlpha: 0,
+        scale: 0.8,
+        duration: 10,
         ease: "power2.inOut"
       }, 75);
 
-    });
-
-    // Pulse Trigger (Project Section)
-    const pulseTween = gsap.to(svgRef.current, {
-      scale: 0.65,
-      repeat: -1,
-      yoyo: true,
-      duration: 0.8,
-      ease: "sine.inOut",
-      paused: true
-    });
-
-    ScrollTrigger.create({
-      trigger: "#project-section",
-      start: "top center",
-      onEnter: () => pulseTween.play(),
-      onLeaveBack: () => pulseTween.pause()
     });
 
     return () => ctx.revert();
@@ -220,9 +214,19 @@ export function EvolutionSection({ onToggleHeader }: EvolutionSectionProps) {
       {/* Center fixed text */}
       <div
         ref={centerTextRef}
-        className="evolution-center-text font-display font-bold text-5xl text-brand-black absolute z-10 origin-center"
+        className="evolution-center-text font-display font-bold text-5xl text-brand-black absolute z-10 origin-center top-[40%] md:top-1/2 -translate-y-1/2"
       >
         Mykyta Polovianiuk
+      </div>
+
+      {/* Intro Arrow Only (Text Removed) */}
+      <div
+        ref={introRef}
+        className="absolute top-[55%] md:top-[60%] flex flex-col items-center gap-4 z-10"
+      >
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="black" strokeWidth="2">
+          <path d="M12 4V20M12 20L18 14M12 20L6 14" />
+        </svg>
       </div>
 
       {/* Scattered words */}
@@ -230,7 +234,7 @@ export function EvolutionSection({ onToggleHeader }: EvolutionSectionProps) {
         <div
           key={word}
           ref={(el) => { wordsRef.current[index] = el; }}
-          className="absolute font-display font-bold text-xl text-brand-black whitespace-nowrap origin-center"
+          className="absolute font-display font-bold text-3xl text-brand-black whitespace-nowrap origin-center"
         >
           {word}
         </div>
@@ -239,7 +243,7 @@ export function EvolutionSection({ onToggleHeader }: EvolutionSectionProps) {
       {/* Morphing SVG */}
       <svg
         ref={svgRef}
-        className="w-[300px] h-[300px] absolute z-20 origin-center"
+        className="w-[300px] h-[300px] absolute z-20 origin-center will-change-transform"
         viewBox="0 0 100 100"
       >
         <path

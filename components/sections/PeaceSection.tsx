@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useRef } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { useGSAP } from '@gsap/react';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
@@ -11,31 +11,45 @@ if (typeof window !== 'undefined') {
 
 interface PeaceSectionProps {
     onToggleHeader?: (visible: boolean) => void;
+    onToggleTheme?: (isDark: boolean) => void;
 }
 
-export function PeaceSection({ onToggleHeader }: PeaceSectionProps) {
+export function PeaceSection({ onToggleHeader, onToggleTheme }: PeaceSectionProps) {
     const [isBlack, setIsBlack] = useState(false);
     const containerRef = useRef<HTMLElement>(null);
+    const isBlackRef = useRef(false);
+
+    useEffect(() => {
+        isBlackRef.current = isBlack;
+    }, [isBlack]);
 
     useGSAP(() => {
-        // Header Visibility Control
+        // Header Visibility Control & Theme
         ScrollTrigger.create({
             trigger: containerRef.current,
-            start: "top bottom", // As soon as it enters view? Or closer to enter? Design says "reappears ONLY when user reaches Peace". 
-            // Let's say when 50% visible?
-            // Instruction: "In PeaceSection: When onEnter (reached bottom), set headerVisible(true)"
-            // "onLeaveBack (scrolling up to Projects), set headerVisible(false)"
-            onEnter: () => onToggleHeader?.(true),
-            onLeaveBack: () => onToggleHeader?.(false)
+            start: "top bottom",
+            onEnter: () => {
+                onToggleHeader?.(true);
+                if (isBlackRef.current) onToggleTheme?.(true);
+            },
+            onLeaveBack: () => {
+                onToggleHeader?.(false);
+                onToggleTheme?.(false);
+            }
         });
     }, { scope: containerRef });
+
+    const handleClick = () => {
+        setIsBlack(true);
+        onToggleTheme?.(true); // Signal theme change
+    };
 
 
     return (
         <section
             ref={containerRef}
             id="peace-section"
-            onClick={() => setIsBlack(!isBlack)}
+            onClick={handleClick} // One-way interaction
             className={`relative h-screen w-full overflow-hidden transition-colors duration-0 cursor-pointer ${isBlack ? 'bg-black' : 'bg-white'
                 }`}
         >
@@ -58,32 +72,19 @@ export function PeaceSection({ onToggleHeader }: PeaceSectionProps) {
 
 
             {/* 
-          B. FOOTER ELEMENTS (Absolute)
-          Colors switch based on isBlack
-          Using Tailwind for positioning approximations based on 1440x1024 ref
-      */}
-
             {/* 1. Email (Left) -> Bottom ~35px, Left 52px */}
-            <a
-                href="mailto:mykytapolovianiuk.work@gmail.com"
-                className={`absolute left-[32px] md:left-[52px] bottom-[35px] font-sans text-base underline z-10 ${isBlack ? 'text-white' : 'text-black'
-                    }`}
-            >
-                mykytapolovianiuk.work@gmail.com
-            </a>
+            <div className={`absolute left-[32px] md:left-[52px] bottom-[35px] font-sans text-base underline z-10 bg-transparent ${isBlack ? 'text-white' : 'text-black'}`}>
+                <a href="mailto:mykytapolovianiuk.work@gmail.com">mykytapolovianiuk.work@gmail.com</a>
+            </div>
 
             {/* 2. Instagram (Right) -> Bottom ~35px, Right ~52px */}
-            <a
-                href="https://instagram.com/shinjiwwww"
-                className={`absolute right-[32px] md:right-[52px] bottom-[35px] font-sans text-base underline z-10 ${isBlack ? 'text-white' : 'text-black'
-                    }`}
-            >
-                instagram
-            </a>
+            <div className={`absolute right-[32px] md:right-[52px] bottom-[35px] font-sans text-base underline z-10 bg-transparent ${isBlack ? 'text-white' : 'text-black'}`}>
+                <a href="https://instagram.com/shinjiwwww">instagram</a>
+            </div>
 
             {/* 3. Location (Center) -> Bottom ~30px */}
             <div
-                className={`absolute left-1/2 -translate-x-1/2 bottom-[30px] font-sans text-base z-10 ${isBlack ? 'text-white' : 'text-black'
+                className={`absolute left-1/2 -translate-x-1/2 bottom-[30px] font-sans text-base z-10 bg-transparent ${isBlack ? 'text-white' : 'text-black'
                     }`}
             >
                 based in Kyiv

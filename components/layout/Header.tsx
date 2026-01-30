@@ -4,9 +4,10 @@ import { useState } from 'react';
 
 interface HeaderProps {
   visible?: boolean;
+  isDark?: boolean;
 }
 
-export function Header({ visible = true }: HeaderProps) {
+export function Header({ visible = true, isDark = false }: HeaderProps) {
   const [isPanelOpen, setIsPanelOpen] = useState(false);
 
   return (
@@ -30,16 +31,10 @@ export function Header({ visible = true }: HeaderProps) {
         </button>
       </header>
 
-      {/* Sidebar - Fixed right, 600px width, black background with CSS transition */}
-      {/* Sidebar should probably remain independent of header visibility? 
-          Or should it also hide? 
-          Usually sidebar stays functional if open, but the trigger button hides.
-          Lets keep logic simple: Sidebar is z-[60], higher than header. 
-          It manages its own state. 
-      */}
-      <div className={`fixed top-0 right-0 h-full w-full md:w-[600px] bg-black z-[60] shadow-2xl transition-transform duration-500 ease-in-out ${isPanelOpen ? 'translate-x-0' : 'translate-x-full'
-        }`}>
-        <div className="relative w-full h-full text-white">
+      {/* Sidebar - Fixed right, 600px width, Swaps color based on Theme */}
+      <div className={`fixed top-0 right-0 h-full w-full md:w-[600px] z-[60] shadow-2xl transition-transform duration-500 ease-in-out ${isPanelOpen ? 'translate-x-0' : 'translate-x-full'
+        } ${isDark ? 'bg-white text-black' : 'bg-black text-white'}`}>
+        <div className={`relative w-full h-full ${isDark ? 'text-black' : 'text-white'}`}>
 
           {/* Close Button */}
           <button
