@@ -85,7 +85,7 @@ export function LoadingScreen({ onComplete }: LoadingScreenProps) {
   return (
     <div
       ref={containerRef}
-      className="fixed inset-0 z-50 flex bg-brand-white transition-opacity duration-300"
+      className="fixed inset-0 z-[100] flex transition-opacity duration-300"
       style={{ opacity: isFontReady ? 1 : 0 }}
     >
       {/* Left Panel - Scrolls DOWN */}
