@@ -9,8 +9,7 @@ if (typeof window !== 'undefined') {
   gsap.registerPlugin(ScrollTrigger);
 }
 
-// 1. GENERATE PATHS (CORRECTED MATCHING VERTICES AT 12 O'CLOCK)
-// Keeping the proven 120-point logic
+// 1. GENERATE PATHS (120 pts, 12 o'clock start)
 const createPolygon = (type: 'square' | 'triangle' | 'circle', points = 120) => {
   const data = [];
   const cx = 50, cy = 50;
@@ -20,35 +19,50 @@ const createPolygon = (type: 'square' | 'triangle' | 'circle', points = 120) => 
     let x = 0, y = 0;
 
     if (type === 'square') {
-      if (t < 0.125) { // Top Center -> Top Right
-        x = 50 + (t / 0.125) * 40; y = 10;
-      } else if (t < 0.375) { // Right
-        x = 90; y = 10 + ((t - 0.125) / 0.25) * 80;
-      } else if (t < 0.625) { // Bottom
-        x = 90 - ((t - 0.375) / 0.25) * 80; y = 90;
-      } else if (t < 0.875) { // Left
-        x = 10; y = 90 - ((t - 0.625) / 0.25) * 80;
-      } else { // Top Left -> Top Center
-        x = 10 + ((t - 0.875) / 0.125) * 40; y = 10;
+      // 0.0 - 0.125: Top Center -> Top Right
+      if (t < 0.125) {
+        const p = t / 0.125;
+        x = 50 + p * 40; y = 10;
+      }
+      // 0.125 - 0.375: Right
+      else if (t < 0.375) {
+        const p = (t - 0.125) / 0.25;
+        x = 90; y = 10 + p * 80;
+      }
+      // 0.375 - 0.625: Bottom
+      else if (t < 0.625) {
+        const p = (t - 0.375) / 0.25;
+        x = 90 - p * 80; y = 90;
+      }
+      // 0.625 - 0.875: Left
+      else if (t < 0.875) {
+        const p = (t - 0.625) / 0.25;
+        x = 10; y = 90 - p * 80;
+      }
+      // 0.875 - 1.0: Top Left -> Top Center
+      else {
+        const p = (t - 0.875) / 0.125;
+        x = 10 + p * 40; y = 10;
       }
     }
     else if (type === 'triangle') {
+      // Top(50,10) -> BR(90,90) -> BL(10,90) -> Top
       if (t < 0.333) {
-        const lt = t / 0.333;
-        x = 50 + lt * 40; y = 10 + lt * 80;
+        const p = t / 0.333;
+        x = 50 + p * 40; y = 10 + p * 80;
       } else if (t < 0.666) {
-        const lt = (t - 0.333) / 0.333;
-        x = 90 - lt * 80; y = 90;
+        const p = (t - 0.333) / 0.333;
+        x = 90 - p * 80; y = 90;
       } else {
-        const lt = (t - 0.666) / 0.333;
-        x = 10 + lt * 40; y = 90 - lt * 80;
+        const p = (t - 0.666) / 0.333;
+        x = 10 + p * 40; y = 90 - p * 80;
       }
     }
     else if (type === 'circle') {
+      // Start -90deg (Top)
       const angle = (t * Math.PI * 2) - (Math.PI / 2);
-      const r = 40;
-      x = cx + r * Math.cos(angle);
-      y = cy + r * Math.sin(angle);
+      x = cx + 40 * Math.cos(angle);
+      y = cy + 40 * Math.sin(angle);
     }
     data.push(`${x.toFixed(2)},${y.toFixed(2)}`);
   }
@@ -61,7 +75,6 @@ const PATH_CIRCLE = createPolygon('circle');
 
 export function EvolutionSection() {
   const containerRef = useRef<HTMLDivElement>(null);
-  const liquidContainerRef = useRef<HTMLDivElement>(null); // For Gooey Filter
   const wordsRef = useRef<(HTMLDivElement | null)[]>([]);
   const svgRef = useRef<SVGSVGElement>(null);
   const pathRef = useRef<SVGPathElement>(null);
@@ -79,24 +92,24 @@ export function EvolutionSection() {
       wordsRef.current.forEach((wordEl) => {
         if (wordEl) {
           gsap.set(wordEl, {
-            x: (Math.random() - 0.5) * 600, // Spread out widely
+            x: (Math.random() - 0.5) * 600,
             y: (Math.random() - 0.5) * 400,
             opacity: 1,
             scale: 1,
-            filter: 'blur(0px)'
+            filter: 'blur(0px)', // NO BLUR
+            letterSpacing: '0px'
           });
         }
       });
 
-      // Center Text
-      gsap.set(centerTextRef.current, { scale: 1, opacity: 1 });
+      gsap.set(centerTextRef.current, { scale: 1, opacity: 1, letterSpacing: '0px' });
 
       // SVG Shape (The "Symbiote Core")
-      // Starts invisible and small
+      // Hidden scale 0.05 (dot)
       gsap.set(svgRef.current, {
         autoAlpha: 1,
-        scale: 0,
-        opacity: 0 // Hidden until "Birth"
+        scale: 0.05,
+        opacity: 0 // Hidden until swap
       });
 
       gsap.set(pathRef.current, { attr: { d: PATH_SQUARE } });
@@ -107,113 +120,142 @@ export function EvolutionSection() {
         scrollTrigger: {
           trigger: containerRef.current,
           pin: true,
-          scrub: 1,
+          scrub: 0.5, // 0.5 scrub for heavy feel
           end: "+=1000%"
         }
       });
 
-      // --- PHASE 1: THE VORTEX (0-20%) ---
-      // Slight rotation/swirl to create energy
-      // We can swirl them by rotating the container or moving individual words in arcs?
-      // Simple approach: random movement to "jitter" them before implosion
+      // --- PHASE 1: EVENT HORIZON (0-20%) ---
+      // Words rotate/swirl
       wordsRef.current.forEach((wordEl, i) => {
-        // Random swirling motion
         const angle = (i / words.length) * Math.PI * 2;
         tl.to(wordEl, {
-          x: `+=${Math.cos(angle) * 50}`,
-          y: `+=${Math.sin(angle) * 50}`,
+          x: `+=${Math.cos(angle) * 30}`,
+          y: `+=${Math.sin(angle) * 30}`,
+          scale: 0.8,
+          rotation: Math.random() * 20 - 10,
           duration: 20,
           ease: "sine.inOut"
         }, 0);
       });
 
-
-      // --- PHASE 2: THE IMPLOSION (SYMBIOTE ASSEMBLY) (20-35%) ---
-      // All words & center text suck into (0,0)
-      // Gooey filter will merge them into a blob
+      // --- PHASE 2: SINGULARITY (20-30%) ---
+      // Implosion to (0,0), Scale -> 0.05, LetterSpacing -> -20px
+      // Creates dense black mass. NO FADING.
 
       wordsRef.current.forEach((wordEl) => {
         tl.to(wordEl, {
           x: 0,
           y: 0,
-          scale: 0.5, // Don't scale to 0 completely, stay as a "clump"
-          opacity: 1,  // Stay visible for the blob
-          duration: 15, // 20->35
+          scale: 0.05,
+          letterSpacing: '-20px',
+          rotation: Math.random() * 360, // Chaos
+          opacity: 1,
+          duration: 10, // 20->30
           ease: "expo.in"
         }, 20);
       });
 
-      // Center text also implodes into the blob
       tl.to(centerTextRef.current, {
-        scale: 0.1,
-        opacity: 1, // Keep opacity to contribute to blob color
-        duration: 15,
+        scale: 0.05,
+        letterSpacing: '-20px',
+        rotation: 180,
+        duration: 10,
         ease: "expo.in"
       }, 20);
 
+      // --- PHASE 3: THE BIG BANG (30-32%) ---
+      // Swap: Words vanish, Shape appears & Scales 0.05 -> 1
 
-      // --- PHASE 3: THE BIRTH (35-40%) ---
-      // Words vanish, Shape appears and expands from the blob
-
-      // 1. Words & Text disappear INSTANTLY (swapped)
+      // 1. Swap visibility Instantly
       tl.to([wordsRef.current, centerTextRef.current], {
-        opacity: 0,
-        duration: 1, // Fast swap
-        immediateRender: false
-      }, 35); // Start of birth
+        autoAlpha: 0,
+        duration: 0.1
+      }, 30);
 
-      // 2. Shape appears (opacity 1) and Scales UP (0 -> 1)
       tl.to(svgRef.current, {
-        opacity: 1, // Visible now
-        scale: 1,   // Explode out
-        duration: 5, // 35 -> 40
-        ease: "elastic.out(1, 0.5)"
-      }, 35);
+        autoAlpha: 1,
+        duration: 0.1
+      }, 30);
+
+      // 2. Explosion
+      tl.to(svgRef.current, {
+        scale: 1,
+        duration: 2, // 30->32 (Very fast)
+        ease: "power4.out" // Aggressive bang
+      }, 30.1);
 
 
-      // --- PHASE 4: MORPHING (Improved Pacing) ---
+      // --- PHASE 4: MORPHING (Hold & Transform) ---
 
-      // 40-55%: HOLD SQUARE (No changes)
+      // 32-45%: HOLD SQUARE
 
-      // 55-60%: MORPH SQUARE -> TRIANGLE
+      // 45-55%: MORPH SQUARE -> TRIANGLE
       const squareToTriangle = interpolate(PATH_SQUARE, PATH_TRIANGLE);
       const proxy1 = { progress: 0 };
 
       tl.to(proxy1, {
         progress: 1,
-        duration: 5, // 55 -> 60 (Fast & Fluid)
-        ease: "power2.inOut",
+        duration: 10, // 45 -> 55
+        ease: "linear",
         onUpdate: () => {
           if (pathRef.current) {
             pathRef.current.setAttribute('d', squareToTriangle(proxy1.progress));
           }
         }
-      }, 55);
+      }, 45);
 
-      // 60-75%: HOLD TRIANGLE (No changes)
+      // 55-70%: HOLD TRIANGLE
 
-      // 75-80%: MORPH TRIANGLE -> CIRCLE
+      // 70-80%: MORPH TRIANGLE -> CIRCLE
       const triangleToCircle = interpolate(PATH_TRIANGLE, PATH_CIRCLE);
       const proxy2 = { progress: 0 };
 
       tl.to(proxy2, {
         progress: 1,
-        duration: 5, // 75 -> 80 (Fast & Fluid)
-        ease: "power2.inOut",
+        duration: 10, // 70 -> 80
+        ease: "linear",
         onUpdate: () => {
           if (pathRef.current) {
             pathRef.current.setAttribute('d', triangleToCircle(proxy2.progress));
           }
         }
-      }, 75);
+      }, 70);
 
-      // 80-100%: FINAL TEXT REVEAL
+      // 80-100%: FINAL TEXT & PULSE
       tl.to(finalTextRef.current, {
         autoAlpha: 1,
-        duration: 20, // 80 -> 100
+        duration: 20,
         ease: "none"
       }, 80);
 
+    });
+
+    // Separate Pulse (Active only at end)
+    const pulseTween = gsap.to(svgRef.current, {
+      scale: 1.05,
+      repeat: -1,
+      yoyo: true,
+      duration: 0.8,
+      ease: "power1.inOut",
+      paused: true
+    });
+
+    ScrollTrigger.create({
+      trigger: containerRef.current,
+      start: "top top",
+      end: "+=1000%",
+      onUpdate: (self) => {
+        if (self.progress > 0.85) {
+          pulseTween.play();
+        } else {
+          pulseTween.pause();
+          // Reset scale if not in "Bang" phase
+          if (self.progress > 0.35) {
+            gsap.to(svgRef.current, { scale: 1, duration: 0.2, overwrite: 'auto' });
+          }
+        }
+      }
     });
 
     return () => ctx.revert();
@@ -224,71 +266,44 @@ export function EvolutionSection() {
       ref={containerRef}
       className="h-screen w-full bg-brand-white flex items-center justify-center relative overflow-hidden"
     >
-      {/* 
-          LIQUID CONTAINER 
-          Everything inside here gets the Gooey effect.
-          Backgrounds must be transparent for it to work well on shapes.
-      */}
+      {/* Center fixed text */}
       <div
-        ref={liquidContainerRef}
-        className="w-full h-full flex items-center justify-center relative"
-        style={{ filter: "url(#goo)" }}
+        ref={centerTextRef}
+        className="evolution-center-text font-display font-bold text-5xl text-brand-black absolute z-10 origin-center"
       >
-        {/* Center fixed text */}
-        <div
-          ref={centerTextRef}
-          className="evolution-center-text font-display font-bold text-5xl text-brand-black absolute z-10"
-        >
-          Mykyta Polovianiuk
-        </div>
-
-        {/* Scattered words */}
-        {words.map((word, index) => (
-          <div
-            key={word}
-            ref={(el) => { wordsRef.current[index] = el; }}
-            className="absolute font-display font-bold text-xl text-brand-black whitespace-nowrap"
-          >
-            {word}
-          </div>
-        ))}
-
-        {/* Morphing SVG (The "Symbiote") */}
-        <svg
-          ref={svgRef}
-          className="w-[300px] h-[300px] absolute z-20"
-          viewBox="0 0 100 100"
-        >
-          <path
-            ref={pathRef}
-            fill="black"
-          />
-        </svg>
+        Mykyta Polovianiuk
       </div>
 
-      {/* Final text (Outside Goo, or Inside? Often better outside to be sharp) */}
+      {/* Scattered words */}
+      {words.map((word, index) => (
+        <div
+          key={word}
+          ref={(el) => { wordsRef.current[index] = el; }}
+          className="absolute font-display font-bold text-xl text-brand-black whitespace-nowrap origin-center"
+        >
+          {word}
+        </div>
+      ))}
+
+      {/* Morphing SVG */}
+      <svg
+        ref={svgRef}
+        className="w-[300px] h-[300px] absolute z-20 origin-center"
+        viewBox="0 0 100 100"
+      >
+        <path
+          ref={pathRef}
+          fill="black"
+        />
+      </svg>
+
+      {/* Final text */}
       <div
         ref={finalTextRef}
         className="font-display font-bold text-2xl text-brand-black absolute bottom-20 z-30 opacity-0"
       >
         everything starts as a shape.
       </div>
-
-      {/* INVISIBLE SVG FILTER DEFINITION */}
-      <svg style={{ visibility: 'hidden', position: 'absolute', width: 0, height: 0 }}>
-        <defs>
-          <filter id="goo">
-            <feGaussianBlur in="SourceGraphic" stdDeviation="10" result="blur" />
-            <feColorMatrix
-              in="blur"
-              mode="matrix"
-              values="1 0 0 0 0  0 1 0 0 0  0 0 1 0 0  0 0 0 19 -9"
-              result="goo"
-            />
-            <feComposite in="SourceGraphic" in2="goo" operator="atop" />
-          </filter>
-        </defs>
-      </svg>
     </div>
   );
 }

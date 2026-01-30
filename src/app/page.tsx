@@ -23,10 +23,15 @@ export default function Home() {
   // Wait for fonts
   /* eslint-disable react-hooks/exhaustive-deps */
   useEffect(() => {
+    // 1. Strict Scroll Restoration
     if (typeof window !== 'undefined') {
-      window.history.scrollRestoration = 'manual';
+      if ('scrollRestoration' in window.history) {
+        window.history.scrollRestoration = 'manual';
+      }
       window.scrollTo(0, 0);
     }
+
+    // 2. Font Checking
     if (typeof document !== 'undefined') {
       document.fonts.ready.then(() => setFontsLoaded(true));
     }
