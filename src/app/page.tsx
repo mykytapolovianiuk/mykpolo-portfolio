@@ -23,6 +23,10 @@ export default function Home() {
   // Wait for fonts
   /* eslint-disable react-hooks/exhaustive-deps */
   useEffect(() => {
+    if (typeof window !== 'undefined') {
+      window.history.scrollRestoration = 'manual';
+      window.scrollTo(0, 0);
+    }
     if (typeof document !== 'undefined') {
       document.fonts.ready.then(() => setFontsLoaded(true));
     }
