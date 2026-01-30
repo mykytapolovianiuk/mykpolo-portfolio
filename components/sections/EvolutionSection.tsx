@@ -243,7 +243,7 @@ export function EvolutionSection({ onToggleHeader }: EvolutionSectionProps) {
       {/* Morphing SVG */}
       <svg
         ref={svgRef}
-        className="w-[300px] h-[300px] absolute z-20 origin-center will-change-transform"
+        className="w-[80vw] max-w-[300px] aspect-square absolute z-20 origin-center will-change-transform"
         viewBox="0 0 100 100"
       >
         <path

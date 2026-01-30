@@ -62,7 +62,7 @@ export function Cursor() {
     return (
         <div
             ref={cursorRef}
-            className="fixed top-0 left-0 w-[12px] h-[12px] bg-white rounded-full pointer-events-none z-[9999] mix-blend-difference"
+            className="hidden md:block fixed top-0 left-0 w-[12px] h-[12px] bg-white rounded-full pointer-events-none z-[9999] mix-blend-difference"
         />
     );
 }

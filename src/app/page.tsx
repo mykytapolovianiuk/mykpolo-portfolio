@@ -20,6 +20,7 @@ export default function Home() {
   const [isLoading, setIsLoading] = useState(true);
   const [headerVisible, setHeaderVisible] = useState(true);
   const [isDark, setIsDark] = useState(false); // Theme state
+  const [isAboutOpen, setIsAboutOpen] = useState(false); // Global About Panel State
   const mainRef = useRef<HTMLElement>(null);
 
   const [fontsLoaded, setFontsLoaded] = useState(false);
@@ -56,10 +57,18 @@ export default function Home() {
 
       {/* Main Content Layer */}
       <main ref={mainRef} className="relative z-0 bg-brand-white min-h-screen">
-        <Header visible={headerVisible} isDark={isDark} />
+        <Header
+          visible={headerVisible}
+          isDark={isDark}
+          isOpen={isAboutOpen}
+          onToggle={setIsAboutOpen}
+        />
 
         {/* Hero Section */}
-        <Hero startAnimation={isHeroAnimating} />
+        <Hero
+          startAnimation={isHeroAnimating}
+          onOpenAbout={() => setIsAboutOpen(true)}
+        />
 
         {/* Evolution Section - Header logic handled inside */}
         <EvolutionSection onToggleHeader={setHeaderVisible} />

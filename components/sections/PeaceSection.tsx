@@ -54,40 +54,61 @@ export function PeaceSection({ onToggleHeader, onToggleTheme }: PeaceSectionProp
                 }`}
         >
             {/* 
-          A. CENTER TEXT 
-          White Mode: "PEACE" (180px, Black)
-          Black Mode: "For those who can't see this" (20px, White)
-      */}
-            <div className="absolute inset-0 flex items-center justify-center pointer-events-none select-none">
-                {!isBlack ? (
-                    <h2 className="font-display font-bold text-[12vw] md:text-[180px] text-black leading-none uppercase tracking-tighter">
-                        PEACE
-                    </h2>
-                ) : (
-                    <h2 className="font-display font-bold text-xl md:text-[20px] text-white leading-none">
-                        "For those who can't see this"
-                    </h2>
-                )}
+                --- MOBILE LAYOUT (<md) ---
+                PEACE (top 389, left 63, 48px)
+                Footer: based in Kyiv (765)
+            */}
+            <div className="block md:hidden">
+                <div className="absolute top-[389px] left-[63px] pointer-events-none select-none">
+                    {!isBlack ? (
+                        <h2 className="font-display font-bold text-[48px] text-black leading-none uppercase">
+                            PEACE
+                        </h2>
+                    ) : (
+                        <h2 className="font-display font-bold text-[24px] text-white leading-none text-center px-4">
+                            "For those who can't see this"
+                        </h2>
+                    )}
+                </div>
+
+                {/* Footer (765 Center) */}
+                <div className={`absolute top-[765px] left-1/2 transform -translate-x-1/2 font-sans text-[16px] whitespace-nowrap ${isBlack ? 'text-white' : 'text-brand-black'}`}>
+                    based in Kyiv
+                </div>
             </div>
 
 
-            {/* 
-            {/* 1. Email (Left) -> Bottom ~35px, Left 52px */}
-            <div className={`absolute left-[32px] md:left-[52px] bottom-[35px] font-sans text-base underline z-10 bg-transparent ${isBlack ? 'text-white' : 'text-black'}`}>
-                <a href="mailto:mykytapolovianiuk.work@gmail.com">mykytapolovianiuk.work@gmail.com</a>
-            </div>
+            {/* --- DESKTOP LAYOUT (md+) --- */}
+            <div className="hidden md:block w-full h-full relative">
+                <div className="absolute inset-0 flex items-center justify-center pointer-events-none select-none">
+                    {!isBlack ? (
+                        <h2 className="font-display font-bold text-[180px] text-black leading-none uppercase tracking-tighter">
+                            PEACE
+                        </h2>
+                    ) : (
+                        <h2 className="font-display font-bold text-[20px] text-white leading-none text-center px-4">
+                            "For those who can't see this"
+                        </h2>
+                    )}
+                </div>
 
-            {/* 2. Instagram (Right) -> Bottom ~35px, Right ~52px */}
-            <div className={`absolute right-[32px] md:right-[52px] bottom-[35px] font-sans text-base underline z-10 bg-transparent ${isBlack ? 'text-white' : 'text-black'}`}>
-                <a href="https://instagram.com/shinjiwwww">instagram</a>
-            </div>
+                {/* 1. Email (Left) */}
+                <div className={`absolute left-[52px] bottom-[35px] font-sans text-base underline z-10 bg-transparent ${isBlack ? 'text-white' : 'text-black'}`}>
+                    <a href="mailto:mykytapolovianiuk.work@gmail.com">mykytapolovianiuk.work@gmail.com</a>
+                </div>
 
-            {/* 3. Location (Center) -> Bottom ~30px */}
-            <div
-                className={`absolute left-1/2 -translate-x-1/2 bottom-[30px] font-sans text-base z-10 bg-transparent ${isBlack ? 'text-white' : 'text-black'
-                    }`}
-            >
-                based in Kyiv
+                {/* 2. Instagram (Right) */}
+                <div className={`absolute right-[52px] bottom-[35px] font-sans text-base underline z-10 bg-transparent ${isBlack ? 'text-white' : 'text-black'}`}>
+                    <a href="https://instagram.com/shinjiwwww">instagram</a>
+                </div>
+
+                {/* 3. Location (Center) */}
+                <div
+                    className={`absolute left-1/2 -translate-x-1/2 bottom-[30px] font-sans text-base z-10 bg-transparent ${isBlack ? 'text-white' : 'text-black'
+                        }`}
+                >
+                    based in Kyiv
+                </div>
             </div>
 
         </section>
