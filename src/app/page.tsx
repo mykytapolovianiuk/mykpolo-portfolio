@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useGSAP } from '@gsap/react';
 import gsap from 'gsap';
 import { LoadingScreen } from '@/components/ui/LoadingScreen';
@@ -12,11 +12,24 @@ export default function Home() {
   const [isLoading, setIsLoading] = useState(true);
 
   useGSAP(() => {
-    // Only need this hook if there are other global animations
-    // Hero animation is now handled inside the Hero component
+    if (typeof window !== 'undefined') {
+      window.history.scrollRestoration = 'manual';
+    }
   }, [isLoading]);
 
+  const [fontsLoaded, setFontsLoaded] = useState(false);
   const [isHeroAnimating, setIsHeroAnimating] = useState(false);
+
+  // Wait for fonts
+  /* eslint-disable react-hooks/exhaustive-deps */
+  useEffect(() => {
+    if (typeof document !== 'undefined') {
+      document.fonts.ready.then(() => setFontsLoaded(true));
+    }
+  }, []);
+
+  if (!fontsLoaded) return null;
+
 
   return (
     <>
