@@ -5,6 +5,11 @@
   --color-brand-white: #FFFFFF;
 }
 
+:root {
+  --font-panchang: 'sans-serif';
+  --font-general: 'sans-serif';
+}
+
 /* Global Cursor Reset - Desktop Only */
 @media (min-width: 768px) {
   * {
