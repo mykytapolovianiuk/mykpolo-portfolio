@@ -13,8 +13,8 @@ const config: Config = {
         'brand-white': '#FFFFFF',
       },
       fontFamily: {
-        'sans': ['General Sans', 'sans-serif'],
-        'display': ['Panchang', 'sans-serif'],
+        'sans': ['var(--font-general)', 'sans-serif'],
+        'display': ['var(--font-panchang)', 'sans-serif'],
       },
       animation: {
         marquee: 'marquee 25s linear infinite',

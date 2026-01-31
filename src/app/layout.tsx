@@ -1,7 +1,22 @@
 import type { Metadata } from "next";
+import localFont from "next/font/local";
 import { SmoothScroll } from '@/components/utils/SmoothScroll';
 import "./globals.css";
 import { Cursor } from "../../components/ui/Cursor";
+
+const panchang = localFont({
+  src: "../fonts/Panchang-Variable.woff2",
+  variable: "--font-panchang",
+  display: "swap",
+  weight: "300 900",
+});
+
+const generalSans = localFont({
+  src: "../fonts/GeneralSans-Variable.woff2",
+  variable: "--font-general",
+  display: "swap",
+  weight: "300 900",
+});
 
 export const metadata: Metadata = {
   title: {
@@ -54,15 +69,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" className="scroll-smooth">
-      <head>
-        <link rel="preconnect" href="https://cdn.fontshare.com" crossOrigin="anonymous" />
-        <link rel="preconnect" href="https://api.fontshare.com" crossOrigin="anonymous" />
-        <link
-          href="https://api.fontshare.com/v2/css?f[]=panchang@200,300,400,500,600,700,800&f[]=general-sans@300,400,500,600,700&display=swap"
-          rel="stylesheet"
-        />
-      </head>
-      <body className="bg-brand-black text-brand-white font-sans select-none cursor-none">
+      <body className={`${panchang.variable} ${generalSans.variable} bg-brand-black text-brand-white font-sans select-none cursor-none antialiased`}>
         <Cursor />
         <SmoothScroll>
           {children}
