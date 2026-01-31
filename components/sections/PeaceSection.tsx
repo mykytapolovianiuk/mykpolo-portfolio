@@ -1,10 +1,10 @@
 'use client';
 
-import { sendGAEvent } from '@/lib/analytics';
+import { sendGAEvent } from '../../lib/analytics';
 import { useState, useRef, useEffect, useLayoutEffect } from 'react';
 import { useGSAP } from '@gsap/react';
 import gsap from 'gsap';
-import { ScrollTrigger } from 'gsap/ScrollTrigger';
+import { ScrollTrigger }gsap / ScrollTrigger';
 
 if (typeof window !== 'undefined') {
     gsap.registerPlugin(ScrollTrigger);

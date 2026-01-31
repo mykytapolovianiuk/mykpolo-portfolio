@@ -3,7 +3,7 @@
 import { useGSAP } from '@gsap/react';
 import gsap from 'gsap';
 import { useRef, useEffect } from 'react';
-import { sendGAEvent } from '@/lib/analytics';
+import { sendGAEvent } from '../../lib/analytics';
 
 interface HeroProps {
     startAnimation: boolean;
