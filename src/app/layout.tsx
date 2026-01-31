@@ -40,6 +40,9 @@ export const metadata: Metadata = {
       'max-snippet': -1,
     },
   },
+  verification: {
+    google: 'googleacf136fa998ff395',
+  },
 };
 
 import { GoogleAnalytics } from '@next/third-parties/google';
