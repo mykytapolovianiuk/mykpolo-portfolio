@@ -55,6 +55,8 @@ export default function RootLayout({
   return (
     <html lang="en" className="scroll-smooth">
       <head>
+        <link rel="preconnect" href="https://cdn.fontshare.com" crossOrigin="anonymous" />
+        <link rel="preconnect" href="https://api.fontshare.com" crossOrigin="anonymous" />
         <link
           href="https://api.fontshare.com/v2/css?f[]=panchang@200,300,400,500,600,700,800&f[]=general-sans@300,400,500,600,700&display=swap"
           rel="stylesheet"

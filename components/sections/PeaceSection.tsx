@@ -111,6 +111,8 @@ export function PeaceSection({ onToggleHeader, onToggleTheme }: PeaceSectionProp
             {/* SCROLL TO TOP BUTTON (New Requirement) */}
             <div className="absolute bottom-[80px] md:bottom-[80px] left-1/2 -translate-x-1/2 z-20">
                 <button
+                    type="button"
+                    aria-label="Activate Peace Mode"
                     onClick={scrollToTop}
                     className={`w-12 h-12 rounded-full border border-current flex items-center justify-center transition-colors hover:opacity-70 ${isBlack ? 'text-white border-white' : 'text-black border-black'}`}
                 >
