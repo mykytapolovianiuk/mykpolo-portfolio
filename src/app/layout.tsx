@@ -8,6 +8,8 @@ export const metadata: Metadata = {
   description: "Minimalist Brutalist Portfolio - Chaos to Structure",
 };
 
+import { GoogleAnalytics } from '@next/third-parties/google';
+
 export default function RootLayout({
   children,
 }: Readonly<{
@@ -26,6 +28,7 @@ export default function RootLayout({
         <SmoothScroll>
           {children}
         </SmoothScroll>
+        <GoogleAnalytics gaId={process.env.NEXT_PUBLIC_GA_ID || ''} />
       </body>
     </html>
   );

@@ -1,5 +1,6 @@
 'use client';
 
+import { sendGAEvent } from '@/lib/analytics';
 import { useState, useRef, useEffect, useLayoutEffect } from 'react';
 import { useGSAP } from '@gsap/react';
 import gsap from 'gsap';
@@ -51,6 +52,7 @@ export function PeaceSection({ onToggleHeader, onToggleTheme }: PeaceSectionProp
     const handleClick = () => {
         setIsBlack(true);
         onToggleTheme?.(true);
+        sendGAEvent('activate_peace_secret', { time: new Date().toISOString() });
     };
 
     const scrollToTop = (e: React.MouseEvent) => {
@@ -68,7 +70,7 @@ export function PeaceSection({ onToggleHeader, onToggleTheme }: PeaceSectionProp
             {/* CENTER TEXT */}
             <div className="absolute inset-0 flex items-center justify-center pointer-events-none select-none">
                 {!isBlack ? (
-                    <h2 className="font-display font-bold text-[22vw] md:text-[180px] text-black leading-none uppercase tracking-tighter">
+                    <h2 className="font-display font-bold text-[18vw] md:text-[180px] text-black leading-none uppercase tracking-tighter">
                         PEACE
                     </h2>
                 ) : (

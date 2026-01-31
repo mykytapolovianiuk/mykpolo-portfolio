@@ -77,6 +77,7 @@ export function EvolutionSection({ onToggleHeader }: EvolutionSectionProps) {
   const pathRef = useRef<SVGPathElement>(null);
   const centerTextRef = useRef<HTMLDivElement>(null);
   const introRef = useRef<HTMLDivElement>(null); // Kept for Arrow
+  const textRef = useRef<HTMLDivElement>(null); // Restoration: Text Ref
 
   const words = ["Ideas", "Code", "Design", "Tech", "Process", "Testing", "Launch", "Iterate"];
 
@@ -84,14 +85,18 @@ export function EvolutionSection({ onToggleHeader }: EvolutionSectionProps) {
     const ctx = gsap.context(() => {
       if (!containerRef.current || !pathRef.current) return;
 
+      // Ensure window is defined (useLayoutEffect runs on client)
+      const isMobile = window.innerWidth < 768;
+
       // --- INITIAL STATES ---
-      // Random VW/VH scattering
+      // Scatter Range: Mobile (50vw), Desktop (90vw)
+      const scatterSpreadX = isMobile ? 50 : 90;
+      const scatterSpreadY = isMobile ? 50 : 60;
+
       wordsRef.current.forEach((wordEl, i) => {
         if (wordEl) {
-          // Random from -45vw to 45vw (90vw spread)
-          // Random from -30vh to 30vh (60vh spread)
-          const xVar = (Math.random() - 0.5) * 90;
-          const yVar = (Math.random() - 0.5) * 60;
+          const xVar = (Math.random() - 0.5) * scatterSpreadX;
+          const yVar = (Math.random() - 0.5) * scatterSpreadY;
 
           gsap.set(wordEl, {
             x: xVar + "vw",
@@ -107,11 +112,8 @@ export function EvolutionSection({ onToggleHeader }: EvolutionSectionProps) {
       gsap.set(centerTextRef.current, { scale: 1, opacity: 1, letterSpacing: '0px' });
       gsap.set(svgRef.current, { autoAlpha: 1, scale: 0.01, opacity: 0 });
       gsap.set(pathRef.current, { attr: { d: PATH_SQUARE } });
-
-      // Start Intro Arrow and Text Visible
       gsap.set(introRef.current, { autoAlpha: 1 });
 
-      // --- MASTER TIMELINE ---
       const tl = gsap.timeline({
         scrollTrigger: {
           trigger: containerRef.current,
@@ -119,12 +121,13 @@ export function EvolutionSection({ onToggleHeader }: EvolutionSectionProps) {
           scrub: 0.5,
           end: "+=1000%",
           onEnter: () => onToggleHeader?.(false),
-          onLeaveBack: () => onToggleHeader?.(true)
+          onLeaveBack: () => onToggleHeader?.(true),
+          invalidateOnRefresh: true,
         }
       });
 
       // Hide Scatter Text on Scroll
-      tl.to(introRef.current, { autoAlpha: 0, duration: 2 }, 0); // Fade out arrow/text immediately
+      tl.to(introRef.current, { autoAlpha: 0, duration: 2 }, 0);
 
       // --- PHASE 1: KINETIC COLLAPSE (0-20%) ---
       const compressParams = {
@@ -158,6 +161,13 @@ export function EvolutionSection({ onToggleHeader }: EvolutionSectionProps) {
         ease: "power1.inOut"
       }, 25);
 
+      // Restoration: Philosophy Text Fade In (45-70)
+      tl.to(textRef.current, {
+        autoAlpha: 1,
+        duration: 25,
+        ease: "power2.inOut"
+      }, 45);
+
       // Triangle -> Circle
       tl.to(pathRef.current, {
         attr: { d: PATH_CIRCLE },
@@ -166,7 +176,7 @@ export function EvolutionSection({ onToggleHeader }: EvolutionSectionProps) {
       }, 50);
 
       // --- PHASE 4: TRANSITION (75-85%) ---
-      tl.to(svgRef.current, {
+      tl.to([svgRef.current, textRef.current], {
         autoAlpha: 0,
         scale: 0.8,
         duration: 10,
@@ -186,7 +196,7 @@ export function EvolutionSection({ onToggleHeader }: EvolutionSectionProps) {
       {/* Center fixed text */}
       <div
         ref={centerTextRef}
-        className="evolution-center-text font-display font-bold text-5xl text-brand-black absolute z-10 origin-center top-[40%] md:top-1/2 -translate-y-1/2"
+        className="evolution-center-text font-display font-bold text-[6.5vw] md:text-5xl text-brand-black absolute z-10 origin-center top-1/2 -translate-y-1/2 whitespace-nowrap"
       >
         Mykyta Polovianiuk
       </div>
@@ -196,8 +206,7 @@ export function EvolutionSection({ onToggleHeader }: EvolutionSectionProps) {
         ref={introRef}
         className="absolute bottom-10 flex flex-col items-center gap-4 z-10 text-brand-black pointer-events-none"
       >
-        <div className="font-sans text-[14px]">Everything starts as a shape</div>
-        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="animate-bounce">
+        <svg width="24" height="24" viewBox="0 0 14 24" fill="none" stroke="currentColor" strokeWidth="2" className="animate-bounce">
           <path d="M12 4V20M12 20L18 14M12 20L6 14" />
         </svg>
       </div>
@@ -207,11 +216,19 @@ export function EvolutionSection({ onToggleHeader }: EvolutionSectionProps) {
         <div
           key={word}
           ref={(el) => { wordsRef.current[index] = el; }}
-          className="absolute font-display font-bold text-3xl text-brand-black whitespace-nowrap origin-center"
+          className="absolute font-display font-bold text-[4.5vw] md:text-3xl text-brand-black whitespace-nowrap origin-center"
         >
           {word}
         </div>
       ))}
+
+      {/* Philosophy Text (Restored) */}
+      <div
+        ref={textRef}
+        className="font-display font-bold text-md md:text-2xl text-brand-black absolute bottom-50 z-30 opacity-0 left-1/2 -translate-x-1/2 whitespace-nowrap"
+      >
+        everything starts as a shape.
+      </div>
 
       {/* Morphing SVG */}
       <svg

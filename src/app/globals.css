@@ -73,12 +73,44 @@ h3,
 }
 
 .animate-infinite-scroll-down {
-  animation: scroll-down 1.2s linear infinite;
-  /* Adjusted speed for smoothness */
+  animation: scroll-down 3s linear infinite;
   will-change: transform;
 }
 
 .animate-infinite-scroll-up {
-  animation: scroll-up 1.2s linear infinite;
+  animation: scroll-up 3s linear infinite;
   will-change: transform;
+}
+
+@keyframes scroll-left {
+  0% {
+    transform: translateX(0);
+  }
+
+  100% {
+    transform: translateX(-50%);
+  }
+}
+
+.animate-infinite-scroll-left {
+  animation: scroll-left 40s linear infinite;
+  will-change: transform;
+}
+
+/* Project Section Responsive Scaling for height */
+.project-section-responsive {
+  transform-origin: center center;
+  transition: transform 0.3s ease-out;
+}
+
+@media (max-height: 950px) {
+  .project-section-responsive {
+    transform: scale(0.85);
+  }
+}
+
+@media (max-height: 800px) {
+  .project-section-responsive {
+    transform: scale(0.75);
+  }
 }

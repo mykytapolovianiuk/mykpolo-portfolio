@@ -16,6 +16,15 @@ const config: Config = {
         'sans': ['General Sans', 'sans-serif'],
         'display': ['Panchang', 'sans-serif'],
       },
+      animation: {
+        marquee: 'marquee 25s linear infinite',
+      },
+      keyframes: {
+        marquee: {
+          '0%': { transform: 'translateX(0%)' },
+          '100%': { transform: 'translateX(-100%)' },
+        },
+      },
       container: {
         center: true,
         padding: {
