@@ -4,8 +4,42 @@ import "./globals.css";
 import { Cursor } from "../../components/ui/Cursor";
 
 export const metadata: Metadata = {
-  title: "mykpolo",
-  description: "Minimalist Brutalist Portfolio - Chaos to Structure",
+  title: {
+    default: 'Mykyta Polovianiuk | Creative Developer',
+    template: '%s | Mykyta Polovianiuk'
+  },
+  description: 'Portfolio of Mykyta Polovianiuk, a Full-stack & Creative Developer based in Kyiv. Expert in Next.js, React, GSAP, and immersive web experiences.',
+  keywords: ['Mykyta Polovianiuk', 'Creative Developer', 'Frontend Developer', 'Kyiv', 'Web Design', 'Next.js Developer', 'React Developer'],
+  authors: [{ name: 'Mykyta Polovianiuk' }],
+  creator: 'Mykyta Polovianiuk',
+  publisher: 'Mykyta Polovianiuk',
+  openGraph: {
+    title: 'Mykyta Polovianiuk | Creative Developer',
+    description: 'Immersive portfolio featuring modern web technologies and creative design.',
+    url: 'https://mykpolo.vercel.app',
+    siteName: 'Mykyta Polovianiuk Portfolio',
+    images: [
+      {
+        url: '/og-image.jpg',
+        width: 1200,
+        height: 630,
+        alt: 'Mykyta Polovianiuk Portfolio',
+      },
+    ],
+    locale: 'en_US',
+    type: 'website',
+  },
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: {
+      index: true,
+      follow: true,
+      'max-video-preview': -1,
+      'max-image-preview': 'large',
+      'max-snippet': -1,
+    },
+  },
 };
 
 import { GoogleAnalytics } from '@next/third-parties/google';

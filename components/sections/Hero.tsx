@@ -42,9 +42,9 @@ export function Hero({ startAnimation, onOpenAbout }: HeroProps) {
             <div className="block md:hidden w-full h-full absolute inset-0">
                 {/* Top Left: MYKPOLO */}
                 <div className="absolute top-[7.7vw] left-[6.9vw] z-20">
-                    <h1 className="font-display font-bold text-[3.7vw] leading-none text-black">
+                    <div className="font-display font-bold text-[3.7vw] leading-none text-black">
                         MYKPOLO
-                    </h1>
+                    </div>
                 </div>
 
                 {/* Top Right: #about */}
@@ -71,9 +71,9 @@ export function Hero({ startAnimation, onOpenAbout }: HeroProps) {
                 {/* Bottom Left: Name */}
                 {/* Reverted to 10% bottom to fix 'too high' issue */}
                 <div className="absolute bottom-[25%] left-[5.3vw] z-20">
-                    <h2 className="font-display font-bold text-[10.6vw] leading-[1.5] text-black">
+                    <h1 className="font-display font-bold text-[10.6vw] leading-[1.5] text-black">
                         Mykyta<br />Polovianiuk
-                    </h2>
+                    </h1>
                 </div>
 
                 {/* Bottom Center: Location & Arrow */}

@@ -57,6 +57,28 @@ export default function Home() {
 
       {/* Main Content Layer */}
       <main ref={mainRef} className="relative z-0 bg-brand-white min-h-screen">
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify({
+              '@context': 'https://schema.org',
+              '@type': 'Person',
+              name: 'Mykyta Polovianiuk',
+              url: 'https://mykpolo.vercel.app',
+              jobTitle: 'Creative Developer',
+              address: {
+                '@type': 'PostalAddress',
+                addressLocality: 'Kyiv',
+                addressCountry: 'Ukraine'
+              },
+              sameAs: [
+                'https://www.instagram.com/shinjiwwww', // Updated from Hero link
+                'https://github.com/mykytapolovianiuk',
+                'https://www.linkedin.com/in/mykytapolovianiuk/'
+              ]
+            })
+          }}
+        />
         <Header
           visible={headerVisible}
           isDark={isDark}
