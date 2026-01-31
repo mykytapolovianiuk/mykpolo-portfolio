@@ -28,7 +28,7 @@ export function LoadingScreen({ onComplete }: LoadingScreenProps) {
 
     const timer = setTimeout(() => {
       setIsVisible(false);
-    }, 2500);
+    }, 800);
 
     return () => clearTimeout(timer);
   }, [isFontReady]);
