@@ -1,22 +1,8 @@
 import type { Metadata } from "next";
-import localFont from "next/font/local";
+import { panchang, generalSans } from './fonts';
 import { SmoothScroll } from '@/components/utils/SmoothScroll';
 import "./globals.css";
 import { Cursor } from "../../components/ui/Cursor";
-
-const panchang = localFont({
-  src: "../fonts/Panchang-Variable.woff2",
-  variable: "--font-panchang",
-  display: "swap",
-  weight: "300 900",
-});
-
-const generalSans = localFont({
-  src: "../fonts/GeneralSans-Variable.woff2",
-  variable: "--font-general",
-  display: "swap",
-  weight: "300 900",
-});
 
 export const metadata: Metadata = {
   title: {
@@ -69,7 +55,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" className="scroll-smooth">
-      <body className={`${panchang.variable} ${generalSans.variable} bg-brand-black text-brand-white font-sans select-none cursor-none antialiased`}>
+      <body className={`${panchang.variable} ${generalSans.variable} font-sans antialiased bg-brand-white text-brand-black overflow-x-hidden select-none cursor-none`}>
         <Cursor />
         <SmoothScroll>
           {children}
